@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <title>使用国内镜像加速 Laravel Sail 构建 - PRIN BLOG</title>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="HandheldFriendly" content="True" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+<meta name="generator" content="Hexo" />
+<link rel="icon" href="/images/favicon.png" />
+  <link rel="canonical" href="https://prinsss.github.io/laravel-sail-built-with-mirrors/"/>
+  <link rel="alternate" type="application/atom+xml" href="/atom.xml" title="PRIN BLOG">
+  <meta name="keywords" content="Laravel,Docker," />
+
+<meta name="description" content="Laravel Sail 是什么？简单来说就是一个基于 Docker 的开发环境。其核心就是一个 docker-compose.yml 配置文件和 sail 脚本，定义了 PHP、MySQL、Redis 等一系列容器，然后把程序放里面跑。 至于好处嘛，主要就是使用方便、运行环境统一、不会弄乱系统。同样是 Laravel 开发，本机安装 LNMP、Valet、Homestead 这些方法我都用过，但">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用国内镜像加速 Laravel Sail 构建">
+<meta property="og:url" content="https://prinsss.github.io/laravel-sail-built-with-mirrors/index.html">
+<meta property="og:site_name" content="PRIN BLOG">
+<meta property="og:description" content="Laravel Sail 是什么？简单来说就是一个基于 Docker 的开发环境。其核心就是一个 docker-compose.yml 配置文件和 sail 脚本，定义了 PHP、MySQL、Redis 等一系列容器，然后把程序放里面跑。 至于好处嘛，主要就是使用方便、运行环境统一、不会弄乱系统。同样是 Laravel 开发，本机安装 LNMP、Valet、Homestead 这些方法我都用过，但">
+<meta property="og:locale">
+<meta property="og:image" content="https://prinsss.github.io/laravel-sail-built-with-mirrors/laravel-sail-app.png">
+<meta property="article:published_time" content="2021-09-13T16:30:00.000Z">
+<meta property="article:modified_time" content="2021-09-13T16:30:00.000Z">
+<meta property="article:author" content="prin">
+<meta property="article:tag" content="Laravel">
+<meta property="article:tag" content="Docker">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://prinsss.github.io/laravel-sail-built-with-mirrors/laravel-sail-app.png">
+  <meta name="google-site-verification" content="GRFMvqszPSgldR5B46PfCl67MehNVagYoA9AtJpd8BA" />
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/han-css@3.3.0/dist/han.min.css">
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Fira+Mono|Roboto+Slab:400,600|Noto+Serif+SC:600&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@10.6.0/styles/atom-one-dark.min.css" media="screen and (prefers-color-scheme: dark)">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@10.6.0/styles/atom-one-light.min.css" media="screen and (prefers-color-scheme: light)">
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/node-tikzjax@latest/css/fonts.css" /><style>.tikzjax { display: block; text-align: center; user-select: none; }</style></head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="site-name">
+      <a class="logo" href="/">PRIN BLOG</a>
+      <span class="description">半吊子全栈开发者的日常</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <div class="row">
+      <section class="content col-md-8 col-12">
+        
+  <article>
+    <h1 class="post-title">
+      <a href="/laravel-sail-built-with-mirrors/">使用国内镜像加速 Laravel Sail 构建</a>
+    </h1>
+    <div class="post-meta">
+      <span class="post-meta-item post-meta-date">
+  <time datetime="2021-09-14T00:30:00+08:00">2021-09-14</time>
+</span>
+
+<span class="post-meta-item post-meta-categories">
+  <span class="post-meta-item-indicator">Category:</span>
+  
+    <a class="category-link" href="/categories/tech/">技术</a>
+  
+</span>
+
+<span class="post-meta-item post-meta-tags">
+  
+    <a class="tag--link" href="/tag/Docker/" rel="tag">Docker</a> <a class="tag--link" href="/tag/Laravel/" rel="tag">Laravel</a>
+  
+</span>
+
+
+<span class="post-meta-item post-meta-views">
+  <span class="pv-counter">loading</span> views
+</span>
+
+
+    </div>
+
+    
+      <script src="https://cdn.jsdelivr.net/npm/dayjs@1.10.4/dayjs.min.js"></script>
+<script>
+  var post_updated = dayjs("2021-09-13T16:30:00.000Z");
+  var days_diff_now = dayjs().diff(post_updated, 'days');
+
+  if (days_diff_now > 365) {
+    document.write(
+      '<div class="post-warning">'+
+        '本文最后修订于 '+days_diff_now+' 天前（'+post_updated.format('YYYY-MM-DD')+'），'+
+        '其中的信息可能已经有所发展或者不再适用于现阶段。'+
+      '</div>'
+    );
+  }
+</script>
+
+    
+
+    
+      <div class="post-toc"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA%E9%A1%B9%E7%9B%AE"><span class="toc-text">创建项目</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9A%E5%88%B6-dockerfile"><span class="toc-text">定制 Dockerfile</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%90%E8%A1%8C%E5%AE%B9%E5%99%A8"><span class="toc-text">运行容器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="toc-text">参考链接</span></a></li></ol></div>
+    
+
+    <div class="post-content"><p>Laravel Sail 是什么？简单来说就是一个基于 Docker 的开发环境。其核心就是一个 <code>docker-compose.yml</code> 配置文件和 <code>sail</code> 脚本，定义了 PHP、MySQL、Redis 等一系列容器，然后把程序放里面跑。</p>
+<p>至于好处嘛，主要就是<strong>使用方便、运行环境统一、不会弄乱系统</strong>。同样是 Laravel 开发，本机安装 LNMP、Valet、Homestead 这些方法我都用过，但现在我肯定首选 Laravel Sail（容器化是真滴爽）。</p>
+<p>不过 Laravel Sail 好是挺好，想要在墙内顺利使用还是要费点功夫的。</p>
+<span id="more"></span>
+<h2 id="创建项目"><a href="#创建项目" class="headerlink" title="创建项目"></a>创建项目</h2>
+<blockquote>
+<p>以下操作均在国内网络环境下运行。<del>其实挂个全局代理这些都不是事啦</del></p>
+</blockquote>
+<p>安装 Docker 和配置 Docker Hub 国内镜像的步骤可以参考<a target="_blank" rel="noopener" href="https://yeasy.gitbook.io/docker_practice/install/mirror">这篇文章</a>。</p>
+<p>创建项目时，直接用 Laravel 官方的<a target="_blank" rel="noopener" href="https://laravel.com/docs/8.x/installation">安装脚本</a>大概率会卡在 Updating dependencies 上，为什么你懂的。不过我们还是可以借鉴下官方脚本的内容：</p>
+<pre class="bash"><code>curl -s https://laravel.build/example-app -o install.sh</code></pre>
+<p>临时新建一个 composer 容器：</p>
+<pre class="bash"><code>docker run -it --rm -v $(pwd):/opt -w /opt \
+  laravelsail/php80-composer:latest bash</code></pre>
+<p>在容器内配置 composer 镜像，创建 Laravel 项目：</p>
+<pre class="bash"><code>composer config -g repo.packagist composer https://mirrors.aliyun.com/composer/
+laravel new example-app</code></pre>
+<p>安装 Laravel Sail 相关文件（这里可自定义需要使用的服务）：</p>
+<pre class="bash"><code>cd example-app
+php ./artisan sail:install --with=mysql,redis,meilisearch,mailhog,selenium</code></pre>
+<p>导出底层 Dockerfile，方便后续定制：</p>
+<pre class="bash"><code>php ./artisan sail:publish</code></pre>
+<p>完成后，可以看到项目下多出了一个 <code>docker</code> 目录和 <code>docker-compose.yml</code> 文件。</p>
+<h2 id="定制-dockerfile"><a href="#定制-dockerfile" class="headerlink" title="定制 Dockerfile"></a>定制 Dockerfile</h2>
+<p>Laravel Sail 有一个主要的容器，用于运行 PHP 主程序。其他比如 <code>composer</code>, <code>artisan</code>, <code>node</code>, <code>npm</code> 命令也是在这个容器里运行的。</p>
+<blockquote>
+<p>后续你可以通过 <code>sail shell</code> 来访问这个容器。</p>
+</blockquote>
+<p>这个主容器的 <a target="_blank" rel="noopener" href="https://github.com/laravel/sail/blob/1.x/runtimes/8.0/Dockerfile">Dockerfile</a> 就是我们上面导出的那个。可以看到它主要就是在 Ubuntu 的基础上安装了一些软件包，大部分的网络问题都是这里造成的。</p>
+<p>使用国内镜像替换之，主要需要替换的软件源有：</p>
+<ul>
+<li>Ubuntu</li>
+<li>PPA</li>
+<li>Composer</li>
+<li>Node.js</li>
+<li>Npm</li>
+</ul>
+<p>修改后的 Dockerfile 如下：</p>
+<pre class="dockerfile"><code>FROM ubuntu:21.04
+
+LABEL maintainer=&quot;Taylor Otwell&quot;
+
+ARG WWWGROUP
+
+WORKDIR /var/www/html
+
+ENV DEBIAN_FRONTEND noninteractive
+ENV TZ=Asia/Shanghai
+ENV APT_MIRROR http://mirrors.ustc.edu.cn
+ENV NVM_DIR /usr/local/nvm
+ENV NODE_VERSION 16.9.1
+ENV NVM_NODEJS_ORG_MIRROR https://mirrors.ustc.edu.cn/node
+ENV NVM_SOURCE https://hub.fastgit.org/nvm-sh/nvm.git
+
+SHELL [&quot;/bin/bash&quot;, &quot;-o&quot;, &quot;pipefail&quot;, &quot;-c&quot;]
+
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime &amp;&amp; echo $TZ &gt; /etc/timezone
+
+RUN echo &#39;APT::Acquire::Retries &quot;5&quot;;&#39; &gt; /etc/apt/apt.conf.d/80-retries \
+  &amp;&amp; sed -i &quot;s|http://archive.ubuntu.com|$APT_MIRROR|g; s|http://security.ubuntu.com|$APT_MIRROR|g&quot; /etc/apt/sources.list \
+  &amp;&amp; sed -i &quot;s|http://ports.ubuntu.com|$APT_MIRROR|g&quot; /etc/apt/sources.list \
+  &amp;&amp; apt-get update \
+  &amp;&amp; apt-get install -y gnupg gosu curl ca-certificates zip unzip git supervisor sqlite3 libcap2-bin libpng-dev python2 \
+  &amp;&amp; mkdir -p ~/.gnupg \
+  &amp;&amp; chmod 600 ~/.gnupg \
+  &amp;&amp; echo &quot;disable-ipv6&quot; &gt;&gt; ~/.gnupg/dirmngr.conf \
+  &amp;&amp; apt-key adv --homedir ~/.gnupg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys E5267A6C \
+  &amp;&amp; apt-key adv --homedir ~/.gnupg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C300EE8C \
+  # PHP
+  &amp;&amp; echo &quot;deb https://launchpad.proxy.ustclug.org/ondrej/php/ubuntu hirsute main&quot; &gt; /etc/apt/sources.list.d/ppa_ondrej_php.list \
+  &amp;&amp; apt-get update \
+  &amp;&amp; apt-get install -y php8.0-cli php8.0-dev \
+    php8.0-pgsql php8.0-sqlite3 php8.0-gd \
+    php8.0-curl php8.0-memcached \
+    php8.0-imap php8.0-mysql php8.0-mbstring \
+    php8.0-xml php8.0-zip php8.0-bcmath php8.0-soap \
+    php8.0-intl php8.0-readline php8.0-pcov \
+    php8.0-msgpack php8.0-igbinary php8.0-ldap \
+    php8.0-redis php8.0-swoole php8.0-xdebug \
+  # Composer
+  &amp;&amp; curl -so /usr/bin/composer https://mirrors.aliyun.com/composer/composer.phar \
+  &amp;&amp; chmod a+x /usr/bin/composer \
+  &amp;&amp; composer --version \
+  &amp;&amp; composer config -g repo.packagist composer https://mirrors.aliyun.com/composer/ \
+  # Node.js
+  &amp;&amp; mkdir -p $NVM_DIR \
+  &amp;&amp; curl -so- https://raw.fastgit.org/nvm-sh/nvm/v0.38.0/install.sh | bash \
+  &amp;&amp; source $NVM_DIR/nvm.sh \
+  &amp;&amp; nvm install $NODE_VERSION \
+  &amp;&amp; nvm use $NODE_VERSION \
+  &amp;&amp; node -v &amp;&amp; npm -v \
+  &amp;&amp; npm config set registry https://registry.npm.taobao.org \
+  # Yarn
+  &amp;&amp; npm install --global yarn \
+  &amp;&amp; yarn config set registry https://registry.npm.taobao.org \
+  &amp;&amp; apt-get install -y mysql-client \
+  &amp;&amp; apt-get install -y postgresql-client \
+  &amp;&amp; apt-get -y autoremove \
+  &amp;&amp; apt-get clean \
+  &amp;&amp; rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+ENV NODE_PATH $NVM_DIR/v$NODE_VERSION/lib/node_modules
+ENV PATH $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
+
+RUN setcap &quot;cap_net_bind_service=+ep&quot; /usr/bin/php8.0
+
+RUN groupadd --force -g $WWWGROUP sail
+RUN useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u 1337 sail
+
+COPY start-container /usr/local/bin/start-container
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY php.ini /etc/php/8.0/cli/conf.d/99-sail.ini
+RUN chmod +x /usr/local/bin/start-container
+
+EXPOSE 8000
+
+ENTRYPOINT [&quot;start-container&quot;]</code></pre>
+<p>目前有个不足之处就是 Node.js 的安装，原来用的 <a target="_blank" rel="noopener" href="https://github.com/nodesource/distributions">NodeSource</a> 现在没有可用的国内镜像源，只能改用 <a target="_blank" rel="noopener" href="https://github.com/nvm-sh/nvm">nvm</a> 安装。但是 nvm 在 <code>PATH</code> 的处理上有些问题（它是通过一个脚本修改环境变量，把当前启用的 Node 版本添加到 <code>PATH</code> 里去，但是 Dockerfile 里不能动态设置 <code>ENV</code>），目前只能手动指定要安装的 Node 版本了。</p>
+<h2 id="运行容器"><a href="#运行容器" class="headerlink" title="运行容器"></a>运行容器</h2>
+<p>使用 Laravel Sail 提供的脚本运行容器：</p>
+<pre class="bash"><code>./vendor/bin/sail up</code></pre>
+<p>这个脚本主要的工作就是读取 <code>.env</code> 里配置的环境变量，然后通过 <code>docker-compose</code> 在容器里执行相应命令，所以基本用法和 <code>docker-compose</code> 是一致的：</p>
+<pre class="bash"><code>sail up -d  # 后台运行
+sail down   # 停止运行</code></pre>
+<p>耐心等待镜像构建完成，Laravel Sail 就可以正常运行啦。</p>
+<pre class="nohighlight"><code>Creating network &quot;example-app_sail&quot; with driver &quot;bridge&quot;
+Creating example-app_redis_1       ... done
+Creating example-app_selenium_1    ... done
+Creating example-app_meilisearch_1 ... done
+Creating example-app_mailhog_1      ... done
+Creating example-app_mysql_1       ... done
+Creating example-app_laravel.test_1 ... done</code></pre>
+<p><img src="/laravel-sail-built-with-mirrors/laravel-sail-app.png" srcset="/images/loading.jpg" data-srcset="/laravel-sail-built-with-mirrors/laravel-sail-app.png" alt="laravel-sail-app" /></p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://learnku.com/articles/56987">将 Laravel 开发环境由 Homestead 迁移到 Laravel Sail (Docker) 完整详细教程</a></li>
+<li><a target="_blank" rel="noopener" href="https://laravel.com/docs/8.x/sail">Laravel Sail - Laravel - The PHP Framework For Web Artisans</a></li>
+<li><a target="_blank" rel="noopener" href="https://gist.github.com/remarkablemark/aacf14c29b3f01d6900d13137b21db3a">Install node and npm with nvm using Docker.</a></li>
+</ul>
+</div>
+    <div class="post-copyright"><p>除另有声明外，本博客文章均采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by/4.0/">知识共享(Creative Commons) 署名 4.0 国际许可协议</a> 进行许可。转载请注明原作者与文章出处。</p></div>
+  </article>
+
+  
+    <nav class="post-nav">
+      
+      <div class="post-nav-item post-nav-prev">上一篇：
+        <a href="/eslint-prettier-commitlint/">使用 ESLint + Prettier + Commitlint 规范代码风格与提交流程</a>
+      </div>
+      
+      
+      <div class="post-nav-item post-nav-next">下一篇：
+        <a href="/blog-theme-dark-mode/">博客主题可以自动切换深色模式啦</a>
+      </div>
+      
+    </nav>
+  
+
+  
+    
+
+
+<script src="https://giscus.app/client.js"
+  data-repo="prinsss/prinsss.github.io"
+  data-repo-id="MDEwOlJlcG9zaXRvcnkxMDU3MzY5MTA="
+  data-category="Announcements"
+  data-category-id="DIC_kwDOBk1qzs4CawFb"
+  data-mapping="title"
+  data-strict="1"
+  data-reactions-enabled="1"
+  data-emit-metadata="0"
+  data-input-position="top"
+  data-theme="preferred_color_scheme"
+  data-lang="zh-CN"
+  data-loading="lazy"
+  crossorigin="anonymous"
+  async>
+</script>
+
+
+  
+
+      </section>
+      <aside class="sidebar col-md-3 offset-md-1 col-12">
+        
+  
+  <section class="widget widget-toc">
+    <h3 class="widget-title">文章目录</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA%E9%A1%B9%E7%9B%AE"><span class="toc-text">创建项目</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9A%E5%88%B6-dockerfile"><span class="toc-text">定制 Dockerfile</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%90%E8%A1%8C%E5%AE%B9%E5%99%A8"><span class="toc-text">运行容器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="toc-text">参考链接</span></a></li></ol>
+  </section>
+  
+
+        
+
+
+<section class="widget" id="widget-categories">
+  <h3 class="widget-title">分类</h3>
+  
+  
+    <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/tech/">技术</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/diary/">日常</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/essay/">随笔</a></li></ul>
+  
+</section>
+
+
+
+<section class="widget" id="widget-pages">
+  <h3 class="widget-title">页面</h3>
+  <ul class="menu">
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives/" title="">归档</a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about/" title="">关于我</a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-friends">
+        <a href="/friends/" title="">朋友们</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+<section class="widget" id="widget-links">
+  <h3 class="widget-title">链接</h3>
+  <ul class="menu">
+    
+      
+      <li class="menu-item menu-item-github">
+        <a href="https://github.com/prinsss" title="" target="_blank">GitHub</a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-rss">
+        <a href="/atom.xml" title="" target="_blank">RSS Feed</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+      </aside>
+    </div>
+  </div>
+</main>
+
+<footer>
+  
+  <div class="container">
+    <p>
+      &copy; 2026 <a href="https://prinsss.github.io">PRIN BLOG</a>. Proudly published with
+      <a href="https://hexo.io/" target="_blank">Hexo</a> & <a href="https://github.com/printempw/hexo-theme-murasaki/" target="_blank">Murasaki</a>.
+    </p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/han-css@3.3.0/dist/han.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@10.6.0/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@17.3.1/dist/lazyload.min.js"></script>
+<script>
+  hljs.initHighlightingOnLoad();
+  Han(document.querySelector('section.content')).setRoutine([
+    'initCond', 'renderElem', 'renderJiya', 'correctBasicBD', 'substCombLigaWithPUA'
+    // 'renderHanging', 'renderHWS'
+  ]).render();
+  new LazyLoad({
+    elements_selector: '.post-content img',
+    callback_loaded: function (el) {
+      el.parentNode.nodeName.toLowerCase() === 'a' || mediumZoom(el, { margin: 24 });
+    }
+  });
+</script>
+  <script async src="https://oishii.prin.studio/delicious-party"
+    data-website-id="02075562-9733-4917-8c28-be13173bb1f7">
+  </script>
+
+</body>
+</html>

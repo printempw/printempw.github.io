@@ -1,0 +1,618 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <title>PRIN BLOG - 半吊子全栈开发者的日常</title>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="HandheldFriendly" content="True" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+<meta name="generator" content="Hexo" />
+<link rel="icon" href="/images/favicon.png" />
+  <link rel="canonical" href="https://prinsss.github.io/page/9/"/>
+  <link rel="alternate" type="application/atom+xml" href="/atom.xml" title="PRIN BLOG">
+  <meta name="keywords" content="prin, prinsss, printempw, blog, 博客, 独立博客" />
+
+<meta name="description" content="这里是 prin 的个人博客，基本上啥都写：开发心得分享，日常吐槽吹水，偶尔也会写点正经文字。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="PRIN BLOG">
+<meta property="og:url" content="https://prinsss.github.io/page/9/index.html">
+<meta property="og:site_name" content="PRIN BLOG">
+<meta property="og:description" content="这里是 prin 的个人博客，基本上啥都写：开发心得分享，日常吐槽吹水，偶尔也会写点正经文字。">
+<meta property="og:locale">
+<meta property="article:author" content="prin">
+<meta name="twitter:card" content="summary">
+  <meta name="google-site-verification" content="GRFMvqszPSgldR5B46PfCl67MehNVagYoA9AtJpd8BA" />
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/han-css@3.3.0/dist/han.min.css">
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Fira+Mono|Roboto+Slab:400,600|Noto+Serif+SC:600&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@10.6.0/styles/atom-one-dark.min.css" media="screen and (prefers-color-scheme: dark)">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@10.6.0/styles/atom-one-light.min.css" media="screen and (prefers-color-scheme: light)">
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/node-tikzjax@latest/css/fonts.css" /><style>.tikzjax { display: block; text-align: center; user-select: none; }</style></head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="site-name">
+      <a class="logo" href="/">PRIN BLOG</a>
+      <span class="description">半吊子全栈开发者的日常</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <div class="row">
+      <section class="content col-md-8 col-12">
+        
+  
+    <article class="post">
+      <h2 class="post-title">
+        <a href="/solution-for-artisan-call-migrate-not-working-when-app-env-is-production/">Artisan::call('migrate') 在 APP_ENV 为 production 时不工作的解决方法</a>
+      </h2>
+      <div class="post-meta">
+        <span class="post-meta-item post-meta-date">
+  <time datetime="2016-12-13T22:44:11+08:00">2016-12-13</time>
+</span>
+
+<span class="post-meta-item post-meta-categories">
+  <span class="post-meta-item-indicator">Category:</span>
+  
+    <a class="category-link" href="/categories/tech/">技术</a>
+  
+</span>
+
+<span class="post-meta-item post-meta-tags">
+  
+    <a class="tag--link" href="/tag/Laravel/" rel="tag">Laravel</a> <a class="tag--link" href="/tag/PHP/" rel="tag">PHP</a>
+  
+</span>
+
+
+<span class="post-meta-item post-meta-views">
+  <span class="pv-counter">loading</span> views
+</span>
+
+
+      </div>
+      <div class="post-content">
+        
+          <p>最近把版本库里 <code>.env.example</code> 的 <code>APP_ENV</code> 字段值从原来的 <code>local</code> 改为了 <code>production</code>，原意是为了更好的区分开发和生产环境。</p>
+<p>然而今天在主机壳的虚拟主机上测试我的程序的时候（准备把演示站搬过去），却出现了奇怪的问题——数据库 Migration 不管用了。</p>
+<p>我是在控制器里通过调用 <code>Artisan::call('migrate')</code> 来执行数据库迁移操作的（毕竟虚拟主机哪来的 shell 访问），但是这次这条命令竟然没有执行任何事务。</p>
+<p>通过 <code>Artisan</code> 执行 <code>Command</code> 的简化流程大概是像这样的：</p>
+<pre><code>Illuminate\Foundation\Console\Kernel
+↓
+Illuminate\Console\Application
+↓
+Illuminate\Console\Command
+↓
+Illuminate\Container\Container
+↓
+// 这个就是执行 Artisan::call(&#39;migrate&#39;) 时调用的类
+Illuminate\Database\Console\Migrations\MigrateCommand
+↓
+……</code></pre>
+<p>经过一段时间的排查，最后锁定了是在 <code>MigrateCommand</code> 这个类停止继续往下执行的，即接下来的脚本都没有被执行到，也就是说问题就出在 <code>MigrateCommand</code> 这里。</p>
+          <p><a class="more-link" href="/solution-for-artisan-call-migrate-not-working-when-app-env-is-production/#more">&gt; READ MORE...</a></p>
+        
+      </div>
+    </article>
+  
+    <article class="post">
+      <h2 class="post-title">
+        <a href="/use-certbot-to-renew-lets-encrypt-certificates/">使用 Certbot 更新 Let's Encrypt 证书</a>
+      </h2>
+      <div class="post-meta">
+        <span class="post-meta-item post-meta-date">
+  <time datetime="2016-12-10T17:38:31+08:00">2016-12-10</time>
+</span>
+
+<span class="post-meta-item post-meta-categories">
+  <span class="post-meta-item-indicator">Category:</span>
+  
+    <a class="category-link" href="/categories/tech/">技术</a>
+  
+</span>
+
+<span class="post-meta-item post-meta-tags">
+  
+    <a class="tag--link" href="/tag/SSL/" rel="tag">SSL</a> <a class="tag--link" href="/tag/%E8%B8%A9%E5%9D%91/" rel="tag">踩坑</a>
+  
+</span>
+
+
+<span class="post-meta-item post-meta-views">
+  <span class="pv-counter">loading</span> views
+</span>
+
+
+      </div>
+      <div class="post-content">
+        
+          <p>Let’s Encrypt 证书即将过期时会给你发送邮件，这个还是比较贴心的。这样也就不会陷入证书过期却没发现的尴尬境地（Let’s Encrypt 的证书只有 90 天的有效期）。</p>
+<p><img src="https://img.prin.studio/images/2017/06/11/2826714bc9645e4b9828433b8e674800.png" srcset="/images/loading.jpg" data-srcset="https://img.prin.studio/images/2017/06/11/2826714bc9645e4b9828433b8e674800.png" alt="2826714bc9645e4b9828433b8e674800.png" /></p>
+<p>以前我写过使用 Certbot 这个工具<a target="_blank" rel="noopener" href="https://prinzeugen.net/use-certbot-to-issue-lets-encrypt-certificates/">申请证书的文章</a>，而同样使用这个工具更新证书只需要一行命令：</p>
+<pre class="shell"><code>certbot renew --post-hook &quot;service nginx reload&quot;</code></pre>
+<p><code>certbot</code> 这个脚本的位置呀名称啥的自己看着改，对于我来说是 <code>./certbot-auto</code>。加了个钩子可以让它在证书更新更新完毕后重载 Nginx 配置来更新证书。</p>
+          <p><a class="more-link" href="/use-certbot-to-renew-lets-encrypt-certificates/#more">&gt; READ MORE...</a></p>
+        
+      </div>
+    </article>
+  
+    <article class="post">
+      <h2 class="post-title">
+        <a href="/implement-of-php-remote-downloading-with-progress-bar/">PHP 远程文件下载的进度条实现</a>
+      </h2>
+      <div class="post-meta">
+        <span class="post-meta-item post-meta-date">
+  <time datetime="2016-11-26T18:25:00+08:00">2016-11-26</time>
+</span>
+
+<span class="post-meta-item post-meta-categories">
+  <span class="post-meta-item-indicator">Category:</span>
+  
+    <a class="category-link" href="/categories/tech/">技术</a>
+  
+</span>
+
+<span class="post-meta-item post-meta-tags">
+  
+    <a class="tag--link" href="/tag/PHP/" rel="tag">PHP</a>
+  
+</span>
+
+
+<span class="post-meta-item post-meta-views">
+  <span class="pv-counter">loading</span> views
+</span>
+
+
+      </div>
+      <div class="post-content">
+        
+          <p>PHP 实现远程下载文件到服务端并不是什么新鲜玩意，用 <code>cURL</code>、<code>file_get_contents</code>、<code>fopen</code> 等都能够轻易实现。</p>
+<p>但是这几种常规的方法都是在一个线程内下载文件，等文件下载完毕以后才能返回 HTTP 响应。所造成的结果就是用户在页面上点击「下载到服务器」按钮后，会看到空白页和加载的小菊花转啊转，转好久之后才出现「下载成功」的页面。</p>
+<p>当然，我上面所举例的情况是只使用纯粹的表单 POST 发送请求的情况。现在的话就算再不济也一般会使用 <code>ajax</code> 发送请求，然后在前台放个加载动画，等收到下载成功的回应之后再进行下一步操作。</p>
+<p><strong>但是！</strong>即使是去掉了恶心的且需要等待的空白页，这样做还是对用户体验有不好的影响。没有具体的下载进度，只有一个一直转呀转的菊花图，估计挺多用户都无法坐和放宽吧<del>（至少对于我来说是这样的）</del></p>
+<p>而我一个 PHP 项目的一键更新系统正好需要重构，遂研究了如何在 PHP 作为后端时显示远程文件下载进度条，并捣鼓出了个像样的解决方案，在这里分享一下。</p>
+          <p><a class="more-link" href="/implement-of-php-remote-downloading-with-progress-bar/#more">&gt; READ MORE...</a></p>
+        
+      </div>
+    </article>
+  
+    <article class="post">
+      <h2 class="post-title">
+        <a href="/tips-for-fixing-audio-jack/">耳机插头修理技巧</a>
+      </h2>
+      <div class="post-meta">
+        <span class="post-meta-item post-meta-date">
+  <time datetime="2016-11-23T19:54:00+08:00">2016-11-23</time>
+</span>
+
+<span class="post-meta-item post-meta-categories">
+  <span class="post-meta-item-indicator">Category:</span>
+  
+    <a class="category-link" href="/categories/diary/">日常</a>
+  
+</span>
+
+<span class="post-meta-item post-meta-tags">
+  
+    <a class="tag--link" href="/tag/%E8%80%B3%E6%9C%BA/" rel="tag">耳机</a> <a class="tag--link" href="/tag/%E8%B8%A9%E5%9D%91/" rel="tag">踩坑</a>
+  
+</span>
+
+
+<span class="post-meta-item post-meta-views">
+  <span class="pv-counter">loading</span> views
+</span>
+
+
+      </div>
+      <div class="post-content">
+        
+          <p>群里大佬 pan爷低价出了我一个耳机插头附近断线的 ATH-ES55，这已经是挺久以前的事了。当时我去某宝上买了个耳机插头，刮掉耳机线的漆包草草焊上去就完事了<del>（好歹是挺不错的耳机你就这样对待啊喂）</del>。然而最近耳机插头接触不良了，我就寻思着重新焊下，在这里记录一下需要注意的地方。</p>
+<p>虽然修耳机这种事我在小学的时候就鼓捣过了，但总归当时还是不专业，也没啥像样的工具。而且最近听的好歹也算是 HiFi 耳机，不能再用之前那种乡巴佬方法了（笑）。在网上搜了一些，学到了不少，在此记录一下。</p>
+<p>下面几乎都是盗图，侵删w</p>
+<h3 id="mm-耳机插头接线图">3.5mm 耳机插头接线图</h3>
+<p><img src="https://img.prin.studio/images/2017/06/10/82f3a4e9e890e1d4ab91352def12f33a.png" srcset="/images/loading.jpg" data-srcset="https://img.prin.studio/images/2017/06/10/82f3a4e9e890e1d4ab91352def12f33a.png" alt="耳机插头示意" /></p>
+          <p><a class="more-link" href="/tips-for-fixing-audio-jack/#more">&gt; READ MORE...</a></p>
+        
+      </div>
+    </article>
+  
+    <article class="post">
+      <h2 class="post-title">
+        <a href="/laravel-plugin-system-1/">Laravel 框架下的插件机制实现（一）—— 构建插件系统</a>
+      </h2>
+      <div class="post-meta">
+        <span class="post-meta-item post-meta-date">
+  <time datetime="2016-11-20T15:41:25+08:00">2016-11-20</time>
+</span>
+
+<span class="post-meta-item post-meta-categories">
+  <span class="post-meta-item-indicator">Category:</span>
+  
+    <a class="category-link" href="/categories/tech/">技术</a>
+  
+</span>
+
+<span class="post-meta-item post-meta-tags">
+  
+    <a class="tag--link" href="/tag/Laravel/" rel="tag">Laravel</a> <a class="tag--link" href="/tag/PHP/" rel="tag">PHP</a>
+  
+</span>
+
+
+<span class="post-meta-item post-meta-views">
+  <span class="pv-counter">loading</span> views
+</span>
+
+
+      </div>
+      <div class="post-content">
+        
+          <p>插件，即 Plug-in（又有外挂、Extension、Addon 等叫法），是一类特定的功能模块，通过和应用程序的互动，用来替应用程序增加一些所需要的特定的功能。插件的特点是：</p>
+<ul>
+<li>当你需要它的时候激活它，不需要它的时候禁用/删除它；</li>
+<li>无论是激活还是禁用都不影响系统核心模块的运行。</li>
+</ul>
+<p>也就是说插件是一种非侵入式的模块化设计，实现了核心程序与插件程序的松散耦合。上面的介绍部分摘自 <a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E6%8F%92%E4%BB%B6">中文 WikiPedia</a>。</p>
+<p>虽然现在网上有很多 PHP 的插件机制的实现（当然我指的是英文内容，中文关于 PHP 插件机制的搜出来现在还是那么点破文章），譬如 <a target="_blank" rel="noopener" href="https://github.com/FoolCode/Plugin">FoolCode/Plugin</a>，或者 WordPress 的插件实现。</p>
+<p>不过我今天想介绍的是如何使用 Laravel 的服务容器、事件机制等功能来实现一个比较优雅的插件机制。</p>
+<p><em>Greatly inspired by <a target="_blank" rel="noopener" href="https://github.com/flarum/core/tree/master/src/Extension">Flarum</a></em>，在此致谢 ヾ(´ωﾟ｀)</p>
+          <p><a class="more-link" href="/laravel-plugin-system-1/#more">&gt; READ MORE...</a></p>
+        
+      </div>
+    </article>
+  
+    <article class="post">
+      <h2 class="post-title">
+        <a href="/how-to-load-gist-dynamically-via-clicking-button/">实现点击按钮加载 Gist 代码块</a>
+      </h2>
+      <div class="post-meta">
+        <span class="post-meta-item post-meta-date">
+  <time datetime="2016-11-01T16:38:38+08:00">2016-11-01</time>
+</span>
+
+<span class="post-meta-item post-meta-categories">
+  <span class="post-meta-item-indicator">Category:</span>
+  
+    <a class="category-link" href="/categories/tech/">技术</a>
+  
+</span>
+
+<span class="post-meta-item post-meta-tags">
+  
+    <a class="tag--link" href="/tag/JavaScript/" rel="tag">JavaScript</a> <a class="tag--link" href="/tag/%E5%88%86%E4%BA%AB/" rel="tag">分享</a>
+  
+</span>
+
+
+<span class="post-meta-item post-meta-views">
+  <span class="pv-counter">loading</span> views
+</span>
+
+
+      </div>
+      <div class="post-content">
+        
+          <p>GitHub Gist 应该也是很多人都在用的功能了，我也喜欢把一些大段的代码块贴上去而不是直接写在博文里。</p>
+<p>但是 Gist 的 embed js 是在页面加载的时候就直接开始加载了的，所以或多或少还是对网页的性能有所影响。受上次搞的「点击加载 Disqus」启发，我也准备写一个点击加载 Gist。</p>
+<p>最开始我尝试了传统方法，即动态创建一个 <code>&lt;script&gt;</code> 标签并添加到文档流中。然而却得到了一个这个错误：</p>
+<pre><code>Failed to execute &#39;write&#39; on &#39;Document&#39;: It isn&#39;t possible to write into a document from an asynchronously-loaded external script unless it is explicitly opened.</code></pre>
+<p>看来动态加载的 js 文件中是不允许写文档流的。而不巧的是 Gist 提供的 embed js 正是使用 <code>document.write</code> 来实现的。</p>
+<p>在网上找了一下，虽然也有些利用 <code>iframe</code> 的解决方法，譬如：<a target="_blank" rel="noopener" href="https://gist.github.com/jeremiahlee/1748966">Dynamic Gist Embedding</a>，但都感觉不咋好<del>（嫌麻烦）</del></p>
+<p>后来，我在 SegmentFault 的动态预览 Gist 的功能上发现了，Gist 竟然能够提供 JSONP 式的回调！</p>
+<p>调用方法只要把 Gist 给你的 embed js 的地址最后的 <code>.js</code> 改为 <code>.json?callback=xxx</code> 即可（完全没查到 (((　ﾟдﾟ)))</p>
+<hr />
+<p>下面贴一下核心代码（同时也是点击预览的 DEMO）：</p>
+<script src="https://gist.github.com/prinsss/a12f8fe71c2e3d7a2c0fcedbc6d625d2.js"></script>
+<p>至于「短代码自动替换」呀、「识别 Gist 链接并 append 预览按钮」（SegmentFault 的做法）之类的，朱军可以继续研究~</p>
+<p>以上。</p>
+
+        
+      </div>
+    </article>
+  
+    <article class="post">
+      <h2 class="post-title">
+        <a href="/use-adb-shell-to-flash-recovery/">使用 ADB Shell 刷入 Recovery</a>
+      </h2>
+      <div class="post-meta">
+        <span class="post-meta-item post-meta-date">
+  <time datetime="2016-10-27T22:07:10+08:00">2016-10-27</time>
+</span>
+
+<span class="post-meta-item post-meta-categories">
+  <span class="post-meta-item-indicator">Category:</span>
+  
+    <a class="category-link" href="/categories/tech/">技术</a>
+  
+</span>
+
+<span class="post-meta-item post-meta-tags">
+  
+    <a class="tag--link" href="/tag/Android/" rel="tag">Android</a>
+  
+</span>
+
+
+<span class="post-meta-item post-meta-views">
+  <span class="pv-counter">loading</span> views
+</span>
+
+
+      </div>
+      <div class="post-content">
+        
+          <p>众所周知 MTK（联发科）的大部分机器都是没有 <code>fastboot</code> 模式的，也就意味着不能进行普通的依赖于 <code>fastboot</code> 系列命令的线刷模式。普通来讲这也没啥特别大的影响，毕竟刷 <code>recovery</code> 可以直接系统里拿到 root 后用工具刷，救砖有 MTK 专用的线刷工具<del>（这玩意的驱动坑的不行）</del>。</p>
+<p>但是，在一些<strong>神秘</strong>的状况下，我<del>们</del>有可能会被没有 <code>fastboot</code> 的情况下坑到。</p>
+<p>这次我想刷的是「朵唯 iSuper S1」，用的是 MTK6589 芯片组。按照惯例刷机之前首先要把 <code>Recovery</code> 换掉以刷入第三方 ROM 包。照理来说这块是没有问题的，但是不知道为什么，市面上的 Root 工具能够让手机拿到 Root 权限，但是在手机上安装权限管理应用时均告失败，也是迷的不行。</p>
+<p>明明 Root 权限都已经拿到了却刷不了 Rec，这也太吃瘪了吧！然而没有 MTK 机子也不能用 fastboot 刷 rec，专门的线刷工具又太难用。。就在这时，我突然想到了一个命令 —— <code>dd</code>。</p>
+          <p><a class="more-link" href="/use-adb-shell-to-flash-recovery/#more">&gt; READ MORE...</a></p>
+        
+      </div>
+    </article>
+  
+    <article class="post">
+      <h2 class="post-title">
+        <a href="/light-novel-recommend-gamers/">轻小说推荐 —— 「GAMERS 电玩咖！」</a>
+      </h2>
+      <div class="post-meta">
+        <span class="post-meta-item post-meta-date">
+  <time datetime="2016-10-12T17:43:00+08:00">2016-10-12</time>
+</span>
+
+<span class="post-meta-item post-meta-categories">
+  <span class="post-meta-item-indicator">Category:</span>
+  
+    <a class="category-link" href="/categories/essay/">随笔</a>
+  
+</span>
+
+<span class="post-meta-item post-meta-tags">
+  
+    <a class="tag--link" href="/tag/ACGN/" rel="tag">ACGN</a>
+  
+</span>
+
+
+<span class="post-meta-item post-meta-views">
+  <span class="pv-counter">loading</span> views
+</span>
+
+
+      </div>
+      <div class="post-content">
+        
+          <p>这次想要推荐的轻小说是「碧阳学园学生会议事录」的作者 —— 葵せきな 的最新作，「ゲーマーズ!」（台译 电玩咖）。说是推荐其实我也没什么好文笔写长文，所以还是贴点链接吧。</p>
+<p><img src="https://moepic.org/images/2016/10/17/b79812bd576d2dcfae343b562b9cf75e.jpg" srcset="/images/loading.jpg" data-srcset="https://moepic.org/images/2016/10/17/b79812bd576d2dcfae343b562b9cf75e.jpg" alt="cover" /></p>
+          <p><a class="more-link" href="/light-novel-recommend-gamers/#more">&gt; READ MORE...</a></p>
+        
+      </div>
+    </article>
+  
+    <article class="post">
+      <h2 class="post-title">
+        <a href="/use-nginx-proxy-to-cache-dynamic-content/">使用 Nginx 反代并缓存动态内容</a>
+      </h2>
+      <div class="post-meta">
+        <span class="post-meta-item post-meta-date">
+  <time datetime="2016-10-04T10:15:00+08:00">2016-10-04</time>
+</span>
+
+<span class="post-meta-item post-meta-categories">
+  <span class="post-meta-item-indicator">Category:</span>
+  
+    <a class="category-link" href="/categories/tech/">技术</a>
+  
+</span>
+
+<span class="post-meta-item post-meta-tags">
+  
+    <a class="tag--link" href="/tag/Nginx/" rel="tag">Nginx</a> <a class="tag--link" href="/tag/%E8%BF%90%E7%BB%B4/" rel="tag">运维</a>
+  
+</span>
+
+
+<span class="post-meta-item post-meta-views">
+  <span class="pv-counter">loading</span> views
+</span>
+
+
+      </div>
+      <div class="post-content">
+        
+          <p>因为着实没想到一个皮肤站竟然会有这么大的并发（好吧其实也不大，QPS 大概 50 左右），所以我之前 开发/部署 Blessing Skin Server 的时候是完全没考虑到缓存优化的。直到后来出现了 <a target="_blank" rel="noopener" href="https://prinzeugen.net/have-been-ddos-and-cc-attacked/">神秘的高并发</a>（QPS 上 200）导致皮肤站宕机我才意识到缓存的重要性。</p>
+<p>我到现在也还是搞不懂那到底是正常流量还是 CC 攻击。。难道正常用户会每秒请求 20+ 次 Json Profile 吗？又不是天天退/进游戏玩 <img src="https://moepic.org/images/2016/10/02/c066215f622f0bf2fe7ee9625955e343.jpg" srcset="/images/loading.jpg" data-srcset="https://moepic.org/images/2016/10/02/c066215f622f0bf2fe7ee9625955e343.jpg" alt="emotion" /></p>
+<p>虽然当时我就花了一点时间给 Json Profile 和皮肤预览之类的地方 <a target="_blank" rel="noopener" href="https://prinzeugen.net/use-observer-pattern-of-laravel-to-implement-loosely-coupled-cache/">加上了缓存</a>，但是由于这些缓存方案都是在 Laravel 层之上的，所以框架的性能依旧是硬伤。试了下 <a target="_blank" rel="noopener" href="https://github.com/StoneGroup/stone">Stone</a> 之类的优化措施也没什么卵效果，再加上我学业也忙了起来，这个问题就被搁置了。</p>
+<p>正好最近国庆放假（虽然只有四天），我就抽了点时间出来研究了一下如何给我的皮肤站套一层缓存 ( ・_ゝ・)</p>
+<h2 id="section">
+          <p><a class="more-link" href="/use-nginx-proxy-to-cache-dynamic-content/#more">&gt; READ MORE...</a></p>
+        
+      </div>
+    </article>
+  
+    <article class="post">
+      <h2 class="post-title">
+        <a href="/awesome-minecraft-shader/">劳资也是开得起 Minecraft 光影的男人辣！</a>
+      </h2>
+      <div class="post-meta">
+        <span class="post-meta-item post-meta-date">
+  <time datetime="2016-10-02T21:52:50+08:00">2016-10-02</time>
+</span>
+
+<span class="post-meta-item post-meta-categories">
+  <span class="post-meta-item-indicator">Category:</span>
+  
+    <a class="category-link" href="/categories/diary/">日常</a>
+  
+</span>
+
+<span class="post-meta-item post-meta-tags">
+  
+    <a class="tag--link" href="/tag/Minecraft/" rel="tag">Minecraft</a>
+  
+</span>
+
+
+<span class="post-meta-item post-meta-views">
+  <span class="pv-counter">loading</span> views
+</span>
+
+
+      </div>
+      <div class="post-content">
+        
+          <p>这次国庆去电脑城摸了块 GTX750（原先的 9800GT 实在是烂得不行了）和一块新硬盘回来，克隆完硬盘后就迫不及待地给 MC 打上了 <code>GLSL Shader Mod</code>。玩了一会后我的表情是这样的：<img src="https://img.prin.studio/images/2017/06/10/c066215f622f0bf2fe7ee9625955e343.jpg" srcset="/images/loading.jpg" data-srcset="https://img.prin.studio/images/2017/06/10/c066215f622f0bf2fe7ee9625955e343.jpg" alt="表情1" /></p>
+<p>不得不说上了光影之后的 MC <strong>根本不是一个游戏啊</strong>！</p>
+<p><img src="https://img.prin.studio/images/2017/06/10/95e7cf170b0d4f5fbe87e97360faacb9.png" srcset="/images/loading.jpg" data-srcset="https://img.prin.studio/images/2017/06/10/95e7cf170b0d4f5fbe87e97360faacb9.png" alt="Screenshot1" /></p>
+          <p><a class="more-link" href="/awesome-minecraft-shader/#more">&gt; READ MORE...</a></p>
+        
+      </div>
+    </article>
+  
+
+  <nav class="pagination">
+  <a class="extend prev" rel="prev" href="/page/8/">Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><a class="page-number" href="/page/8/">8</a><span class="page-number current">9</span><a class="page-number" href="/page/10/">10</a><a class="page-number" href="/page/11/">11</a><span class="space">&hellip;</span><a class="page-number" href="/page/14/">14</a><a class="extend next" rel="next" href="/page/10/">Next</a>
+</nav>
+
+
+      </section>
+      <aside class="sidebar col-md-3 offset-md-1 col-12">
+        
+        
+<section class="widget" id="widget-recent-posts">
+  <h3 class="widget-title">最新文章</h3>
+  <ul class="menu">
+    
+    
+    
+    
+      <li class="menu-item">
+        <a href="/synology-disk-compatibility-fix/">修复 Synology NAS 升级后 M.2 存储池兼容性问题</a>
+      </li>
+    
+      <li class="menu-item">
+        <a href="/zspace-qnap-nas-shared-nut-ups/">极空间与 QNAP NAS 实现共享 NUT UPS</a>
+      </li>
+    
+      <li class="menu-item">
+        <a href="/building-blog-friend-circle/">重构博客友链页面 & 友链朋友圈开源</a>
+      </li>
+    
+      <li class="menu-item">
+        <a href="/react-unstable-nested-components/">真的不可以在 React 组件内部嵌套定义子组件吗？</a>
+      </li>
+    
+      <li class="menu-item">
+        <a href="/graphics-with-tikz-in-hexo/">使用 TikZ 在 Hexo 博客中愉快地画图</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+<section class="widget" id="widget-categories">
+  <h3 class="widget-title">分类</h3>
+  
+  
+    <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/tech/">技术</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/diary/">日常</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/essay/">随笔</a></li></ul>
+  
+</section>
+
+
+
+<section class="widget" id="widget-pages">
+  <h3 class="widget-title">页面</h3>
+  <ul class="menu">
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives/" title="">归档</a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about/" title="">关于我</a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-friends">
+        <a href="/friends/" title="">朋友们</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+<section class="widget" id="widget-links">
+  <h3 class="widget-title">链接</h3>
+  <ul class="menu">
+    
+      
+      <li class="menu-item menu-item-github">
+        <a href="https://github.com/prinsss" title="" target="_blank">GitHub</a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-rss">
+        <a href="/atom.xml" title="" target="_blank">RSS Feed</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+<section class="widget" id="widget-tagcloud">
+  <h3 class="widget-title">标签云</h3>
+  <a href="/tag/ACGN/" style="font-size: 17.86px;">ACGN</a> <a href="/tag/Android/" style="font-size: 15px;">Android</a> <a href="/tag/Apple/" style="font-size: 10.71px;">Apple</a> <a href="/tag/C/" style="font-size: 10.71px;">C++</a> <a href="/tag/CSS/" style="font-size: 11.43px;">CSS</a> <a href="/tag/Docker/" style="font-size: 11.43px;">Docker</a> <a href="/tag/GFW/" style="font-size: 15.71px;">GFW</a> <a href="/tag/Ghost/" style="font-size: 12.86px;">Ghost</a> <a href="/tag/Git/" style="font-size: 10.71px;">Git</a> <a href="/tag/Hexo/" style="font-size: 15px;">Hexo</a> <a href="/tag/JavaScript/" style="font-size: 16.43px;">JavaScript</a> <a href="/tag/LaTeX/" style="font-size: 10px;">LaTeX</a> <a href="/tag/Laravel/" style="font-size: 17.86px;">Laravel</a> <a href="/tag/Linux/" style="font-size: 17.14px;">Linux</a> <a href="/tag/Mac/" style="font-size: 10.71px;">Mac</a> <a href="/tag/Minecraft/" style="font-size: 13.57px;">Minecraft</a> <a href="/tag/NAS/" style="font-size: 10.71px;">NAS</a> <a href="/tag/Nginx/" style="font-size: 12.86px;">Nginx</a> <a href="/tag/OpenWrt/" style="font-size: 10.71px;">OpenWrt</a> <a href="/tag/PHP/" style="font-size: 18.57px;">PHP</a> <a href="/tag/Python/" style="font-size: 12.14px;">Python</a> <a href="/tag/RSS/" style="font-size: 11.43px;">RSS</a> <a href="/tag/React/" style="font-size: 10.71px;">React</a> <a href="/tag/SSL/" style="font-size: 15px;">SSL</a> <a href="/tag/Sublime/" style="font-size: 11.43px;">Sublime</a> <a href="/tag/UserScript/" style="font-size: 10.71px;">UserScript</a> <a href="/tag/VPS/" style="font-size: 17.14px;">VPS</a> <a href="/tag/VSCode/" style="font-size: 10.71px;">VSCode</a> <a href="/tag/VTuber/" style="font-size: 10px;">VTuber</a> <a href="/tag/WebGL/" style="font-size: 10px;">WebGL</a> <a href="/tag/Windows/" style="font-size: 14.29px;">Windows</a> <a href="/tag/WordPress/" style="font-size: 17.14px;">WordPress</a> <a href="/tag/%E5%88%86%E4%BA%AB/" style="font-size: 17.86px;">分享</a> <a href="/tag/%E5%89%8D%E7%AB%AF/" style="font-size: 17.86px;">前端</a> <a href="/tag/%E5%8C%BA%E5%9D%97%E9%93%BE/" style="font-size: 10px;">区块链</a> <a href="/tag/%E5%8D%9A%E5%AE%A2/" style="font-size: 20px;">博客</a> <a href="/tag/%E5%91%BD%E4%BB%A4%E8%A1%8C/" style="font-size: 15.71px;">命令行</a> <a href="/tag/%E5%AD%97%E4%BD%93/" style="font-size: 12.14px;">字体</a> <a href="/tag/%E5%AE%89%E5%88%A9/" style="font-size: 10.71px;">安利</a> <a href="/tag/%E5%B9%B4%E5%BA%A6%E6%80%BB%E7%BB%93/" style="font-size: 11.43px;">年度总结</a> <a href="/tag/%E6%95%99%E7%A8%8B/" style="font-size: 10.71px;">教程</a> <a href="/tag/%E6%B0%B4/" style="font-size: 10.71px;">水</a> <a href="/tag/%E7%89%A9%E8%81%94%E7%BD%91/" style="font-size: 10px;">物联网</a> <a href="/tag/%E7%AC%94%E8%AE%B0/" style="font-size: 10.71px;">笔记</a> <a href="/tag/%E7%BD%91%E7%BB%9C/" style="font-size: 12.86px;">网络</a> <a href="/tag/%E8%80%B3%E6%9C%BA/" style="font-size: 12.86px;">耳机</a> <a href="/tag/%E8%AF%84%E6%B5%8B/" style="font-size: 11.43px;">评测</a> <a href="/tag/%E8%B8%A9%E5%9D%91/" style="font-size: 19.29px;">踩坑</a> <a href="/tag/%E8%BF%90%E7%BB%B4/" style="font-size: 13.57px;">运维</a> <a href="/tag/%E9%9F%B3%E8%A7%86%E9%A2%91/" style="font-size: 14.29px;">音视频</a>
+</section>
+
+
+      </aside>
+    </div>
+  </div>
+</main>
+
+<footer>
+  
+  <div class="container">
+    <p>
+      &copy; 2026 <a href="https://prinsss.github.io">PRIN BLOG</a>. Proudly published with
+      <a href="https://hexo.io/" target="_blank">Hexo</a> & <a href="https://github.com/printempw/hexo-theme-murasaki/" target="_blank">Murasaki</a>.
+    </p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/han-css@3.3.0/dist/han.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@10.6.0/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@17.3.1/dist/lazyload.min.js"></script>
+<script>
+  hljs.initHighlightingOnLoad();
+  Han(document.querySelector('section.content')).setRoutine([
+    'initCond', 'renderElem', 'renderJiya', 'correctBasicBD', 'substCombLigaWithPUA'
+    // 'renderHanging', 'renderHWS'
+  ]).render();
+  new LazyLoad({
+    elements_selector: '.post-content img',
+    callback_loaded: function (el) {
+      el.parentNode.nodeName.toLowerCase() === 'a' || mediumZoom(el, { margin: 24 });
+    }
+  });
+</script>
+  <script async src="https://oishii.prin.studio/delicious-party"
+    data-website-id="02075562-9733-4917-8c28-be13173bb1f7">
+  </script>
+
+</body>
+</html>

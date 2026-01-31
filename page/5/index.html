@@ -1,0 +1,594 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <title>PRIN BLOG - 半吊子全栈开发者的日常</title>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="HandheldFriendly" content="True" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+<meta name="generator" content="Hexo" />
+<link rel="icon" href="/images/favicon.png" />
+  <link rel="canonical" href="https://prinsss.github.io/page/5/"/>
+  <link rel="alternate" type="application/atom+xml" href="/atom.xml" title="PRIN BLOG">
+  <meta name="keywords" content="prin, prinsss, printempw, blog, 博客, 独立博客" />
+
+<meta name="description" content="这里是 prin 的个人博客，基本上啥都写：开发心得分享，日常吐槽吹水，偶尔也会写点正经文字。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="PRIN BLOG">
+<meta property="og:url" content="https://prinsss.github.io/page/5/index.html">
+<meta property="og:site_name" content="PRIN BLOG">
+<meta property="og:description" content="这里是 prin 的个人博客，基本上啥都写：开发心得分享，日常吐槽吹水，偶尔也会写点正经文字。">
+<meta property="og:locale">
+<meta property="article:author" content="prin">
+<meta name="twitter:card" content="summary">
+  <meta name="google-site-verification" content="GRFMvqszPSgldR5B46PfCl67MehNVagYoA9AtJpd8BA" />
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/han-css@3.3.0/dist/han.min.css">
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Fira+Mono|Roboto+Slab:400,600|Noto+Serif+SC:600&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@10.6.0/styles/atom-one-dark.min.css" media="screen and (prefers-color-scheme: dark)">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@10.6.0/styles/atom-one-light.min.css" media="screen and (prefers-color-scheme: light)">
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/node-tikzjax@latest/css/fonts.css" /><style>.tikzjax { display: block; text-align: center; user-select: none; }</style></head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="site-name">
+      <a class="logo" href="/">PRIN BLOG</a>
+      <span class="description">半吊子全栈开发者的日常</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <div class="row">
+      <section class="content col-md-8 col-12">
+        
+  
+    <article class="post">
+      <h2 class="post-title">
+        <a href="/hexo-posts-in-subfolder/">使用子文件夹管理 Hexo 文章且不改变文章永久链接</a>
+      </h2>
+      <div class="post-meta">
+        <span class="post-meta-item post-meta-date">
+  <time datetime="2019-10-13T03:38:00+08:00">2019-10-13</time>
+</span>
+
+<span class="post-meta-item post-meta-categories">
+  <span class="post-meta-item-indicator">Category:</span>
+  
+    <a class="category-link" href="/categories/tech/">技术</a>
+  
+</span>
+
+<span class="post-meta-item post-meta-tags">
+  
+    <a class="tag--link" href="/tag/Hexo/" rel="tag">Hexo</a> <a class="tag--link" href="/tag/%E5%8D%9A%E5%AE%A2/" rel="tag">博客</a>
+  
+</span>
+
+
+<span class="post-meta-item post-meta-views">
+  <span class="pv-counter">loading</span> views
+</span>
+
+
+      </div>
+      <div class="post-content">
+        
+          <blockquote>
+<p><strong>2020-01-15 更新</strong>：如果你只是想实现「文章源码放在子目录、永久链接保持不变」的效果，可以直接修改 <code>_config.yml</code> 中的配置：</p>
+<pre class="yaml"><code>permalink: :name/
+new_post_name: :year/:title.md</code></pre>
+<p>感谢 <a target="_blank" rel="noopener" href="https://skk.moe/"><span class="citation" data-cites="SukkaW">@SukkaW</span></a> 在评论区提供的建议！</p>
+</blockquote>
+<p>在 Hexo 中，我们可以通过站点配置中的 <code>permalink</code> 配置项来指定文章的永久链接的格式。比如说默认值是 <code>:year/:month/:day/:title/</code>，那么一篇 slug 为 <code>hello-world</code> 的文章，最终生成的链接就是 <code>2019/10/13/hello-world/</code>。</p>
+<p>如果你不想分得这么细，也可以根据自己的喜好 <a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/permalinks">自定义这个配置项</a>。本博客就将其设置为了 <code>:title/</code>，即仅使用文章的 slug 作为永久链接，更清爽一些。</p>
+<p>但是这样一来，文章源文件的管理就有点难办了。Hexo 中所有的文章（Post layout）都存放在 <code>source/_posts</code> 目录中，如果仅使用 slug 作为文件名的话，文章一多就会出现乱成一坨的惨状 —— 只能通过文件名查找，根本无法通过日期定位文章！</p>
+          <p><a class="more-link" href="/hexo-posts-in-subfolder/#more">&gt; READ MORE...</a></p>
+        
+      </div>
+    </article>
+  
+    <article class="post">
+      <h2 class="post-title">
+        <a href="/disqus-migration-tools-url-mapper/">使用 URL Mapper 迁移整理 Disqus 评论</a>
+      </h2>
+      <div class="post-meta">
+        <span class="post-meta-item post-meta-date">
+  <time datetime="2019-09-26T22:06:00+08:00">2019-09-26</time>
+</span>
+
+<span class="post-meta-item post-meta-categories">
+  <span class="post-meta-item-indicator">Category:</span>
+  
+    <a class="category-link" href="/categories/tech/">技术</a>
+  
+</span>
+
+<span class="post-meta-item post-meta-tags">
+  
+    <a class="tag--link" href="/tag/%E5%8D%9A%E5%AE%A2/" rel="tag">博客</a>
+  
+</span>
+
+
+<span class="post-meta-item post-meta-views">
+  <span class="pv-counter">loading</span> views
+</span>
+
+
+      </div>
+      <div class="post-content">
+        
+          <p>本文主要介绍了 Disqus 提供的评论迁移工具之一，URL Mapper 的使用方法。</p>
+          <p><a class="more-link" href="/disqus-migration-tools-url-mapper/#more">&gt; READ MORE...</a></p>
+        
+      </div>
+    </article>
+  
+    <article class="post">
+      <h2 class="post-title">
+        <a href="/first-post-of-2019/">博客更新报告：2019 年的第一篇博文</a>
+      </h2>
+      <div class="post-meta">
+        <span class="post-meta-item post-meta-date">
+  <time datetime="2019-09-23T05:00:00+08:00">2019-09-23</time>
+</span>
+
+<span class="post-meta-item post-meta-categories">
+  <span class="post-meta-item-indicator">Category:</span>
+  
+    <a class="category-link" href="/categories/diary/">日常</a>
+  
+</span>
+
+<span class="post-meta-item post-meta-tags">
+  
+    <a class="tag--link" href="/tag/%E5%8D%9A%E5%AE%A2/" rel="tag">博客</a> <a class="tag--link" href="/tag/%E6%B0%B4/" rel="tag">水</a>
+  
+</span>
+
+
+<span class="post-meta-item post-meta-views">
+  <span class="pv-counter">loading</span> views
+</span>
+
+
+      </div>
+      <div class="post-content">
+        
+          <p>哎呀你看，这人博客草都长三米高了耶！博主好摸哦！</p>
+<hr />
+<p>好久不见。各位最近过得怎么样？我还是老样子，忙。又摸又忙。</p>
+<p>大概从去年年底开始到最近几个月，我在某个项目（大概能算是项目吧？）上投注了大量的时间和精力，以至于基本没有时间顾及这边的东西。从我的 GitHub 格子就可以很直观地看出来，我这一年实属摸得透彻。</p>
+<p><img src="https://img.prin.studio/images/2019/09/23/github-activities-2018-now.png" srcset="/images/loading.jpg" data-srcset="https://img.prin.studio/images/2019/09/23/github-activities-2018-now.png" alt="github-activities-2018-now" /></p>
+<p>至于在忙什么，等到以后能公开的时候我会写一篇博客聊一聊的。</p>
+<p>回到正题。这次久违的博文主要是报告一下博客的变化。<strong>没错，我终于换主题啦！</strong></p>
+          <p><a class="more-link" href="/first-post-of-2019/#more">&gt; READ MORE...</a></p>
+        
+      </div>
+    </article>
+  
+    <article class="post">
+      <h2 class="post-title">
+        <a href="/hexo-plugin-to-make-posts-sage-unlisted/">为 Hexo 博客添加隐藏文章功能</a>
+      </h2>
+      <div class="post-meta">
+        <span class="post-meta-item post-meta-date">
+  <time datetime="2018-11-14T23:33:30+08:00">2018-11-14</time>
+</span>
+
+<span class="post-meta-item post-meta-categories">
+  <span class="post-meta-item-indicator">Category:</span>
+  
+    <a class="category-link" href="/categories/tech/">技术</a>
+  
+</span>
+
+<span class="post-meta-item post-meta-tags">
+  
+    <a class="tag--link" href="/tag/Hexo/" rel="tag">Hexo</a> <a class="tag--link" href="/tag/JavaScript/" rel="tag">JavaScript</a> <a class="tag--link" href="/tag/%E5%8D%9A%E5%AE%A2/" rel="tag">博客</a>
+  
+</span>
+
+
+<span class="post-meta-item post-meta-views">
+  <span class="pv-counter">loading</span> views
+</span>
+
+
+      </div>
+      <div class="post-content">
+        
+          <blockquote>
+<p>更新：咕了一万年之后插件终于更新了，从 <code>hexo-sage-posts</code> 更名为 <code>hexo-hide-posts</code>，修复了「上一篇 / 下一篇文章」暴露隐藏文章入口的问题，添加了 <code>hidden:list</code> 命令，另外用了点小 hack，支持自动向隐藏文章页面插入 <code>noindex</code> 标签防止搜索引擎收录。</p>
+</blockquote>
+<p>隐藏博客中某些特定的文章应该算是一个比较常见的需求，毕竟谁都有些不希望让别人看到的东西。当然啦，你可能会说，「不想被看到就不要放到博客上来嘛」。话是没错，不过有时候人就是这么别扭，想让某些文章被看到，却又不想被所有人看到，又或者是某些文章只想和自己熟悉的人一起分享。</p>
+          <p><a class="more-link" href="/hexo-plugin-to-make-posts-sage-unlisted/#more">&gt; READ MORE...</a></p>
+        
+      </div>
+    </article>
+  
+    <article class="post">
+      <h2 class="post-title">
+        <a href="/setup-nginx-php-on-windows/">Windows 下手动搭建 PHP + Nginx/Apache 开发环境</a>
+      </h2>
+      <div class="post-meta">
+        <span class="post-meta-item post-meta-date">
+  <time datetime="2018-11-01T23:00:10+08:00">2018-11-01</time>
+</span>
+
+<span class="post-meta-item post-meta-categories">
+  <span class="post-meta-item-indicator">Category:</span>
+  
+    <a class="category-link" href="/categories/tech/">技术</a>
+  
+</span>
+
+<span class="post-meta-item post-meta-tags">
+  
+    <a class="tag--link" href="/tag/Nginx/" rel="tag">Nginx</a> <a class="tag--link" href="/tag/PHP/" rel="tag">PHP</a>
+  
+</span>
+
+
+<span class="post-meta-item post-meta-views">
+  <span class="pv-counter">loading</span> views
+</span>
+
+
+      </div>
+      <div class="post-content">
+        
+          <p>看到这个标题，有人可能会想吐槽：</p>
+<p><strong>你他娘的写了这么久 PHP，怎么现在想起来搭建开发环境了？</strong></p>
+<p>呃，情况呢是这么个情况，我之前开发的那个 PHP 项目 (<a target="_blank" rel="noopener" href="https://github.com/prinsss/blessing-skin-server/">blessing-skin-server</a>) 在两个月前发布 v3.5.0 版本后基本就已经告一段落了。虽然我本意是不再更新<del>（弃坑的委婉说法）</del>，因为当前的版本已经足够完善，该有的东西都有了（而且说实话搞了这么久我也腻味，不仅是对这个程序，还有对国内 Minecraft 开发生态以及用户群体的失望）。</p>
+<p>不过我的朋友 <a target="_blank" rel="noopener" href="https://blog.gplane.win/">g-plane</a> 说他愿意接坑，所以现在这个项目的后续开发都是他在搞。而我也乐得清闲，做个甩手掌柜 <a href="https://prinsss.github.io/vscode-c-cpp-configuration-for-acm-oj/">搞别的</a> 去了。当我摸鱼正快活时，他过来联系我说准备发布 4.0.0-alpha 了，我才想起来这茬：「啊，我连新版本长啥样都还不知道呢！😂」于是急急忙忙 pull 了新代码准备 review 一下，却发现我的新笔电上甚至压根儿就没安装 PHP 开发环境，只能说是非常地真实。</p>
+          <p><a class="more-link" href="/setup-nginx-php-on-windows/#more">&gt; READ MORE...</a></p>
+        
+      </div>
+    </article>
+  
+    <article class="post">
+      <h2 class="post-title">
+        <a href="/live-stream-recorder-for-vtuber-fans/">一种监测 VTuber 直播并自动录像的方法</a>
+      </h2>
+      <div class="post-meta">
+        <span class="post-meta-item post-meta-date">
+  <time datetime="2018-10-29T23:45:36+08:00">2018-10-29</time>
+</span>
+
+<span class="post-meta-item post-meta-categories">
+  <span class="post-meta-item-indicator">Category:</span>
+  
+    <a class="category-link" href="/categories/tech/">技术</a>
+  
+</span>
+
+<span class="post-meta-item post-meta-tags">
+  
+    <a class="tag--link" href="/tag/VTuber/" rel="tag">VTuber</a> <a class="tag--link" href="/tag/%E9%9F%B3%E8%A7%86%E9%A2%91/" rel="tag">音视频</a>
+  
+</span>
+
+
+<span class="post-meta-item post-meta-views">
+  <span class="pv-counter">loading</span> views
+</span>
+
+
+      </div>
+      <div class="post-content">
+        
+          <p>首先是惯例的闲聊时间。</p>
+<p>虽然这是我第一次在这个博客中提到 <a target="_blank" rel="noopener" href="https://zh.wikipedia.org/zh-cn/%E8%99%9B%E6%93%ACYouTuber">Virtual YouTuber</a>，不过我大概也算是比较早开始看 VTuber 的那一批人了。从始皇帝老爱（<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E7%B5%86%E6%84%9B">キズナアイ</a>）诞生、四天王聚首，到年初 <a target="_blank" rel="noopener" href="https://ja.wikipedia.org/wiki/%E3%83%90%E3%83%BC%E3%83%81%E3%83%A3%E3%83%AB%E3%81%AE%E3%81%98%E3%82%83%E3%83%AD%E3%83%AA%E7%8B%90%E5%A8%98Youtuber%E3%81%8A%E3%81%98%E3%81%95%E3%82%93">狐叔</a> 引领的个人势井喷，再到以彩虹社（<a target="_blank" rel="noopener" href="https://ja.wikipedia.org/wiki/%E3%81%AB%E3%81%98%E3%81%95%E3%82%93%E3%81%98">にじさんじ</a>）为首的 2D 势、杂谈生放势展示了 VTuber 更大的可能性，而注意到这块肥肉的资本们也纷纷入场，百花争鸣的 VTuber 战国时代就此拉开序幕……如此种种，VTuber 界的快速发展令人眼花缭乱，也难怪有「一个月 = VTuber 历一年」的说法。</p>
+          <p><a class="more-link" href="/live-stream-recorder-for-vtuber-fans/#more">&gt; READ MORE...</a></p>
+        
+      </div>
+    </article>
+  
+    <article class="post">
+      <h2 class="post-title">
+        <a href="/phpstudy-prober-page-502-bad-gateway/">phpStudy 访问探针页面出现 502 Bad Gateway 的解决方法</a>
+      </h2>
+      <div class="post-meta">
+        <span class="post-meta-item post-meta-date">
+  <time datetime="2018-10-21T20:36:42+08:00">2018-10-21</time>
+</span>
+
+<span class="post-meta-item post-meta-categories">
+  <span class="post-meta-item-indicator">Category:</span>
+  
+    <a class="category-link" href="/categories/tech/">技术</a>
+  
+</span>
+
+<span class="post-meta-item post-meta-tags">
+  
+    <a class="tag--link" href="/tag/PHP/" rel="tag">PHP</a> <a class="tag--link" href="/tag/%E8%B8%A9%E5%9D%91/" rel="tag">踩坑</a>
+  
+</span>
+
+
+<span class="post-meta-item post-meta-views">
+  <span class="pv-counter">loading</span> views
+</span>
+
+
+      </div>
+      <div class="post-content">
+        
+          <p>不要问我为什么要用 phpStudy，我也不想。</p>
+          <p><a class="more-link" href="/phpstudy-prober-page-502-bad-gateway/#more">&gt; READ MORE...</a></p>
+        
+      </div>
+    </article>
+  
+    <article class="post">
+      <h2 class="post-title">
+        <a href="/new-nickname-prin/">新的网络昵称：PRIN 🍮</a>
+      </h2>
+      <div class="post-meta">
+        <span class="post-meta-item post-meta-date">
+  <time datetime="2018-10-03T12:24:52+08:00">2018-10-03</time>
+</span>
+
+<span class="post-meta-item post-meta-categories">
+  <span class="post-meta-item-indicator">Category:</span>
+  
+    <a class="category-link" href="/categories/diary/">日常</a>
+  
+</span>
+
+<span class="post-meta-item post-meta-tags">
+  
+    <a class="tag--link" href="/tag/%E6%B0%B4/" rel="tag">水</a>
+  
+</span>
+
+
+<span class="post-meta-item post-meta-views">
+  <span class="pv-counter">loading</span> views
+</span>
+
+
+      </div>
+      <div class="post-content">
+        
+          <blockquote>
+<p>2019-11-30 更新：博客标题确实是改成 PRIN BLOG 了，不过「布丁」这个名字说实话后来一次也没用过……还是算了吧，怪尴尬的。</p>
+</blockquote>
+<p>这不是我第一次这么想：</p>
+<p><strong>我的常用 ID <code>printempw</code> 太难读了。</strong></p>
+<p>有多难读呢？难读到连我自己都不知道这玩意该怎么读。</p>
+          <p><a class="more-link" href="/new-nickname-prin/#more">&gt; READ MORE...</a></p>
+        
+      </div>
+    </article>
+  
+    <article class="post">
+      <h2 class="post-title">
+        <a href="/vscode-c-cpp-configuration-for-acm-oj/">使用 VS Code 搭建适用于 ACM 练习的 C/C++ 开发环境</a>
+      </h2>
+      <div class="post-meta">
+        <span class="post-meta-item post-meta-date">
+  <time datetime="2018-10-02T18:17:00+08:00">2018-10-02</time>
+</span>
+
+<span class="post-meta-item post-meta-categories">
+  <span class="post-meta-item-indicator">Category:</span>
+  
+    <a class="category-link" href="/categories/tech/">技术</a>
+  
+</span>
+
+<span class="post-meta-item post-meta-tags">
+  
+    <a class="tag--link" href="/tag/C/" rel="tag">C++</a> <a class="tag--link" href="/tag/VSCode/" rel="tag">VSCode</a>
+  
+</span>
+
+
+<span class="post-meta-item post-meta-views">
+  <span class="pv-counter">loading</span> views
+</span>
+
+
+      </div>
+      <div class="post-content">
+        
+          <p>大学入学也快一个月了，总的来说，我过得很开心，不枉我花费一年的时间 <a href="https://prinsss.github.io/check-in-2018-07/">高考复读</a>。具体哪里令人开心呢？我觉得最主要的是，比起初高中，大学的时间分配更为自由。</p>
+<p><strong>中学时代，学生的时间基本都被学校安排得死死的</strong>：早上什么时间必须到校，然后开始早读、上午五节课下午三节课、晚读、晚自习，最后在规定的时间离校（住宿生还要在规定的时间就寝），可以自由分配的时间少得可怜，在某些管理严格的学校甚至连人身自由都要被限制。虽然学生们苦中作乐的摸鱼技巧也不容小觑，但考虑到升学的压力，如果在兴趣上分配的时间过多，很有可能就会像我去年一样落得个无法升学的尴尬境地。</p>
+<p><strong>而大学相对来说就没有那么多破规矩</strong>：有课就上，没课的话时间就随你安排，回寝室睡觉也好出门嗨皮也罢，突出一个爱干嘛干嘛。在这些闲暇时间里，有人选择加入社团以及各种各样的学生组织，有人寻欢作乐讴歌青春，有人一头扎进自己的兴趣爱好中，也有人选择当个快乐摸鱼侠无事一身轻。</p>
+<p>而我就比较硬核了，我选择参加可能让我基本告别头发的 ACM 程序设计竞赛（不）。</p>
+          <p><a class="more-link" href="/vscode-c-cpp-configuration-for-acm-oj/#more">&gt; READ MORE...</a></p>
+        
+      </div>
+    </article>
+  
+    <article class="post">
+      <h2 class="post-title">
+        <a href="/wsl-guide/">WSL 配置指北：打造 Windows 最强命令行</a>
+      </h2>
+      <div class="post-meta">
+        <span class="post-meta-item post-meta-date">
+  <time datetime="2018-09-08T15:07:41+08:00">2018-09-08</time>
+</span>
+
+<span class="post-meta-item post-meta-categories">
+  <span class="post-meta-item-indicator">Category:</span>
+  
+    <a class="category-link" href="/categories/tech/">技术</a>
+  
+</span>
+
+<span class="post-meta-item post-meta-tags">
+  
+    <a class="tag--link" href="/tag/Linux/" rel="tag">Linux</a> <a class="tag--link" href="/tag/Windows/" rel="tag">Windows</a> <a class="tag--link" href="/tag/%E5%91%BD%E4%BB%A4%E8%A1%8C/" rel="tag">命令行</a>
+  
+</span>
+
+
+<span class="post-meta-item post-meta-views">
+  <span class="pv-counter">loading</span> views
+</span>
+
+
+      </div>
+      <div class="post-content">
+        
+          <p>在两年前的八月，Microsoft 正式发布了 Windows 10 Anniversary Update 周年更新（它还有着 RS1，Version 1607，Build 14393 等一大堆别名）。其中最让包括我在内的众多开发者感到兴奋的特性之一，就是 WSL（Windows Subsystem for Linux，当时还叫 Bash on Ubuntu on Windows）的正式加入。</p>
+<p><strong>在 Windows 上原生运行 Linux 可执行文件，牛逼疯了！</strong></p>
+<p>然而 Bug10 也不是浪得虚名，原本只提供给 Insider 的 WSL 在正式发布后依然问题多多（不仅 zsh、tmux 等工具无法使用，网络相关的操作更是一概欠奉，还有各种各样 <a target="_blank" rel="noopener" href="https://twitter.com/i/status/927862325280772096">奇妙的 BUG</a>），基本没有可用性，我在尝鲜了一段时间后也不得不重回 Cygwin 的怀抱。不过好消息是，在之后的更新中，<a target="_blank" rel="noopener" href="https://blogs.msdn.microsoft.com/commandline/2017/04/11/windows-10-creators-update-whats-new-in-bashwsl-windows-console/">这些 BUG 都已被逐一消灭</a>。</p>
+<p>经过了两年的发展，WSL 已经<a target="_blank" rel="noopener" href="https://twitter.com/i/status/927898980385677312">足够成熟</a>，我也是时候完成这篇<a target="_blank" rel="noopener" href="https://twitter.com/i/status/928656863310200832">一咕再咕</a>的博文了。</p>
+<p>（开学在即，仓促成文，如有谬误，还请指正。）</p>
+<p><img src="https://img.prin.studio/images/2018/09/08/get-wsl.png" srcset="/images/loading.jpg" data-srcset="https://img.prin.studio/images/2018/09/08/get-wsl.png" alt="get-wsl" /></p>
+          <p><a class="more-link" href="/wsl-guide/#more">&gt; READ MORE...</a></p>
+        
+      </div>
+    </article>
+  
+
+  <nav class="pagination">
+  <a class="extend prev" rel="prev" href="/page/4/">Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><a class="page-number" href="/page/7/">7</a><span class="space">&hellip;</span><a class="page-number" href="/page/14/">14</a><a class="extend next" rel="next" href="/page/6/">Next</a>
+</nav>
+
+
+      </section>
+      <aside class="sidebar col-md-3 offset-md-1 col-12">
+        
+        
+<section class="widget" id="widget-recent-posts">
+  <h3 class="widget-title">最新文章</h3>
+  <ul class="menu">
+    
+    
+    
+    
+      <li class="menu-item">
+        <a href="/synology-disk-compatibility-fix/">修复 Synology NAS 升级后 M.2 存储池兼容性问题</a>
+      </li>
+    
+      <li class="menu-item">
+        <a href="/zspace-qnap-nas-shared-nut-ups/">极空间与 QNAP NAS 实现共享 NUT UPS</a>
+      </li>
+    
+      <li class="menu-item">
+        <a href="/building-blog-friend-circle/">重构博客友链页面 & 友链朋友圈开源</a>
+      </li>
+    
+      <li class="menu-item">
+        <a href="/react-unstable-nested-components/">真的不可以在 React 组件内部嵌套定义子组件吗？</a>
+      </li>
+    
+      <li class="menu-item">
+        <a href="/graphics-with-tikz-in-hexo/">使用 TikZ 在 Hexo 博客中愉快地画图</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+<section class="widget" id="widget-categories">
+  <h3 class="widget-title">分类</h3>
+  
+  
+    <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/tech/">技术</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/diary/">日常</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/essay/">随笔</a></li></ul>
+  
+</section>
+
+
+
+<section class="widget" id="widget-pages">
+  <h3 class="widget-title">页面</h3>
+  <ul class="menu">
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives/" title="">归档</a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about/" title="">关于我</a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-friends">
+        <a href="/friends/" title="">朋友们</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+<section class="widget" id="widget-links">
+  <h3 class="widget-title">链接</h3>
+  <ul class="menu">
+    
+      
+      <li class="menu-item menu-item-github">
+        <a href="https://github.com/prinsss" title="" target="_blank">GitHub</a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-rss">
+        <a href="/atom.xml" title="" target="_blank">RSS Feed</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+<section class="widget" id="widget-tagcloud">
+  <h3 class="widget-title">标签云</h3>
+  <a href="/tag/ACGN/" style="font-size: 17.86px;">ACGN</a> <a href="/tag/Android/" style="font-size: 15px;">Android</a> <a href="/tag/Apple/" style="font-size: 10.71px;">Apple</a> <a href="/tag/C/" style="font-size: 10.71px;">C++</a> <a href="/tag/CSS/" style="font-size: 11.43px;">CSS</a> <a href="/tag/Docker/" style="font-size: 11.43px;">Docker</a> <a href="/tag/GFW/" style="font-size: 15.71px;">GFW</a> <a href="/tag/Ghost/" style="font-size: 12.86px;">Ghost</a> <a href="/tag/Git/" style="font-size: 10.71px;">Git</a> <a href="/tag/Hexo/" style="font-size: 15px;">Hexo</a> <a href="/tag/JavaScript/" style="font-size: 16.43px;">JavaScript</a> <a href="/tag/LaTeX/" style="font-size: 10px;">LaTeX</a> <a href="/tag/Laravel/" style="font-size: 17.86px;">Laravel</a> <a href="/tag/Linux/" style="font-size: 17.14px;">Linux</a> <a href="/tag/Mac/" style="font-size: 10.71px;">Mac</a> <a href="/tag/Minecraft/" style="font-size: 13.57px;">Minecraft</a> <a href="/tag/NAS/" style="font-size: 10.71px;">NAS</a> <a href="/tag/Nginx/" style="font-size: 12.86px;">Nginx</a> <a href="/tag/OpenWrt/" style="font-size: 10.71px;">OpenWrt</a> <a href="/tag/PHP/" style="font-size: 18.57px;">PHP</a> <a href="/tag/Python/" style="font-size: 12.14px;">Python</a> <a href="/tag/RSS/" style="font-size: 11.43px;">RSS</a> <a href="/tag/React/" style="font-size: 10.71px;">React</a> <a href="/tag/SSL/" style="font-size: 15px;">SSL</a> <a href="/tag/Sublime/" style="font-size: 11.43px;">Sublime</a> <a href="/tag/UserScript/" style="font-size: 10.71px;">UserScript</a> <a href="/tag/VPS/" style="font-size: 17.14px;">VPS</a> <a href="/tag/VSCode/" style="font-size: 10.71px;">VSCode</a> <a href="/tag/VTuber/" style="font-size: 10px;">VTuber</a> <a href="/tag/WebGL/" style="font-size: 10px;">WebGL</a> <a href="/tag/Windows/" style="font-size: 14.29px;">Windows</a> <a href="/tag/WordPress/" style="font-size: 17.14px;">WordPress</a> <a href="/tag/%E5%88%86%E4%BA%AB/" style="font-size: 17.86px;">分享</a> <a href="/tag/%E5%89%8D%E7%AB%AF/" style="font-size: 17.86px;">前端</a> <a href="/tag/%E5%8C%BA%E5%9D%97%E9%93%BE/" style="font-size: 10px;">区块链</a> <a href="/tag/%E5%8D%9A%E5%AE%A2/" style="font-size: 20px;">博客</a> <a href="/tag/%E5%91%BD%E4%BB%A4%E8%A1%8C/" style="font-size: 15.71px;">命令行</a> <a href="/tag/%E5%AD%97%E4%BD%93/" style="font-size: 12.14px;">字体</a> <a href="/tag/%E5%AE%89%E5%88%A9/" style="font-size: 10.71px;">安利</a> <a href="/tag/%E5%B9%B4%E5%BA%A6%E6%80%BB%E7%BB%93/" style="font-size: 11.43px;">年度总结</a> <a href="/tag/%E6%95%99%E7%A8%8B/" style="font-size: 10.71px;">教程</a> <a href="/tag/%E6%B0%B4/" style="font-size: 10.71px;">水</a> <a href="/tag/%E7%89%A9%E8%81%94%E7%BD%91/" style="font-size: 10px;">物联网</a> <a href="/tag/%E7%AC%94%E8%AE%B0/" style="font-size: 10.71px;">笔记</a> <a href="/tag/%E7%BD%91%E7%BB%9C/" style="font-size: 12.86px;">网络</a> <a href="/tag/%E8%80%B3%E6%9C%BA/" style="font-size: 12.86px;">耳机</a> <a href="/tag/%E8%AF%84%E6%B5%8B/" style="font-size: 11.43px;">评测</a> <a href="/tag/%E8%B8%A9%E5%9D%91/" style="font-size: 19.29px;">踩坑</a> <a href="/tag/%E8%BF%90%E7%BB%B4/" style="font-size: 13.57px;">运维</a> <a href="/tag/%E9%9F%B3%E8%A7%86%E9%A2%91/" style="font-size: 14.29px;">音视频</a>
+</section>
+
+
+      </aside>
+    </div>
+  </div>
+</main>
+
+<footer>
+  
+  <div class="container">
+    <p>
+      &copy; 2026 <a href="https://prinsss.github.io">PRIN BLOG</a>. Proudly published with
+      <a href="https://hexo.io/" target="_blank">Hexo</a> & <a href="https://github.com/printempw/hexo-theme-murasaki/" target="_blank">Murasaki</a>.
+    </p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/han-css@3.3.0/dist/han.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@10.6.0/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@17.3.1/dist/lazyload.min.js"></script>
+<script>
+  hljs.initHighlightingOnLoad();
+  Han(document.querySelector('section.content')).setRoutine([
+    'initCond', 'renderElem', 'renderJiya', 'correctBasicBD', 'substCombLigaWithPUA'
+    // 'renderHanging', 'renderHWS'
+  ]).render();
+  new LazyLoad({
+    elements_selector: '.post-content img',
+    callback_loaded: function (el) {
+      el.parentNode.nodeName.toLowerCase() === 'a' || mediumZoom(el, { margin: 24 });
+    }
+  });
+</script>
+  <script async src="https://oishii.prin.studio/delicious-party"
+    data-website-id="02075562-9733-4917-8c28-be13173bb1f7">
+  </script>
+
+</body>
+</html>

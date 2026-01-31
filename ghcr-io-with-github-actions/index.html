@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <title>GitHub 全家桶：Actions 自动构建多架构 Docker 镜像并上传至 Packages (ghcr.io) - PRIN BLOG</title>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="HandheldFriendly" content="True" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+<meta name="generator" content="Hexo" />
+<link rel="icon" href="/images/favicon.png" />
+  <link rel="canonical" href="https://prinsss.github.io/ghcr-io-with-github-actions/"/>
+  <link rel="alternate" type="application/atom+xml" href="/atom.xml" title="PRIN BLOG">
+  <meta name="keywords" content="Docker," />
+
+<meta name="description" content="前段时间把 GitHub 的用户名修改成了 @prinsss，准备把其他地方的账号也修改一下的时候，却发现 Docker Hub 的 username 不能改，只能砍掉重练（npm 也是）。 想想反正我 Docker Hub 上也没上传什么东西，不如就用 GitHub 自家的 Container registry 来托管镜像吧！ 这里有个小插曲：其实我挺早之前就想要改名了，但当时在忙秋招，考虑到改">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GitHub 全家桶：Actions 自动构建多架构 Docker 镜像并上传至 Packages (ghcr.io)">
+<meta property="og:url" content="https://prinsss.github.io/ghcr-io-with-github-actions/index.html">
+<meta property="og:site_name" content="PRIN BLOG">
+<meta property="og:description" content="前段时间把 GitHub 的用户名修改成了 @prinsss，准备把其他地方的账号也修改一下的时候，却发现 Docker Hub 的 username 不能改，只能砍掉重练（npm 也是）。 想想反正我 Docker Hub 上也没上传什么东西，不如就用 GitHub 自家的 Container registry 来托管镜像吧！ 这里有个小插曲：其实我挺早之前就想要改名了，但当时在忙秋招，考虑到改">
+<meta property="og:locale">
+<meta property="og:image" content="https://prinsss.github.io/ghcr-io-with-github-actions/packages-hello-world.png">
+<meta property="og:image" content="https://prinsss.github.io/ghcr-io-with-github-actions/manage-actions-access.png">
+<meta property="article:published_time" content="2021-11-24T10:30:00.000Z">
+<meta property="article:modified_time" content="2021-11-24T10:30:00.000Z">
+<meta property="article:author" content="prin">
+<meta property="article:tag" content="Docker">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://prinsss.github.io/ghcr-io-with-github-actions/packages-hello-world.png">
+  <meta name="google-site-verification" content="GRFMvqszPSgldR5B46PfCl67MehNVagYoA9AtJpd8BA" />
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/han-css@3.3.0/dist/han.min.css">
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Fira+Mono|Roboto+Slab:400,600|Noto+Serif+SC:600&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@10.6.0/styles/atom-one-dark.min.css" media="screen and (prefers-color-scheme: dark)">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@10.6.0/styles/atom-one-light.min.css" media="screen and (prefers-color-scheme: light)">
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/node-tikzjax@latest/css/fonts.css" /><style>.tikzjax { display: block; text-align: center; user-select: none; }</style></head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="site-name">
+      <a class="logo" href="/">PRIN BLOG</a>
+      <span class="description">半吊子全栈开发者的日常</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <div class="row">
+      <section class="content col-md-8 col-12">
+        
+  <article>
+    <h1 class="post-title">
+      <a href="/ghcr-io-with-github-actions/">GitHub 全家桶：Actions 自动构建多架构 Docker 镜像并上传至 Packages (ghcr.io)</a>
+    </h1>
+    <div class="post-meta">
+      <span class="post-meta-item post-meta-date">
+  <time datetime="2021-11-24T18:30:00+08:00">2021-11-24</time>
+</span>
+
+<span class="post-meta-item post-meta-categories">
+  <span class="post-meta-item-indicator">Category:</span>
+  
+    <a class="category-link" href="/categories/tech/">技术</a>
+  
+</span>
+
+<span class="post-meta-item post-meta-tags">
+  
+    <a class="tag--link" href="/tag/Docker/" rel="tag">Docker</a>
+  
+</span>
+
+
+<span class="post-meta-item post-meta-views">
+  <span class="pv-counter">loading</span> views
+</span>
+
+
+    </div>
+
+    
+      <script src="https://cdn.jsdelivr.net/npm/dayjs@1.10.4/dayjs.min.js"></script>
+<script>
+  var post_updated = dayjs("2021-11-24T10:30:00.000Z");
+  var days_diff_now = dayjs().diff(post_updated, 'days');
+
+  if (days_diff_now > 365) {
+    document.write(
+      '<div class="post-warning">'+
+        '本文最后修订于 '+days_diff_now+' 天前（'+post_updated.format('YYYY-MM-DD')+'），'+
+        '其中的信息可能已经有所发展或者不再适用于现阶段。'+
+      '</div>'
+    );
+  }
+</script>
+
+    
+
+    
+      <div class="post-toc"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#github-packages-%E4%BB%8B%E7%BB%8D"><span class="toc-text">GitHub Packages 介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%89%8B%E5%8A%A8%E4%B8%8A%E4%BC%A0%E9%95%9C%E5%83%8F"><span class="toc-text">手动上传镜像</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%87%AA%E5%8A%A8%E6%9E%84%E5%BB%BA%E5%B9%B6%E4%B8%8A%E4%BC%A0"><span class="toc-text">自动构建并上传</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%8A%E4%BC%A0%E6%97%B6%E5%87%BA%E7%8E%B0-400-bad-request"><span class="toc-text">上传时出现 400 Bad Request</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%8A%E4%BC%A0%E6%97%B6%E5%87%BA%E7%8E%B0-403-forbidden"><span class="toc-text">上传时出现 403 Forbidden</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%83%E6%95%B0%E6%8D%AE%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90"><span class="toc-text">元数据自动生成</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%80%E5%90%8E"><span class="toc-text">最后</span></a></li></ol></div>
+    
+
+    <div class="post-content"><p>前段时间把 GitHub 的用户名修改成了 <a target="_blank" rel="noopener" href="https://github.com/prinsss"><span class="citation" data-cites="prinsss">@prinsss</span></a>，准备把其他地方的账号也修改一下的时候，却发现 Docker Hub 的 username 不能改，只能<a target="_blank" rel="noopener" href="https://hub.docker.com/support/doc/how-do-i-change-my-docker-username">砍掉重练</a>（npm 也是）。</p>
+<p>想想反正我 Docker Hub 上也没上传什么东西，不如就用 GitHub 自家的 Container registry 来托管镜像吧！</p>
+<p>这里有个小插曲：其实我挺早之前就想要改名了，但当时在忙秋招，考虑到改名后可能会有一些后续要处理（擦屁股），所以只是创建了一个 organization 把名字占住，等有时间了再正式改名。然而后来我把组织删了，想要修改 GitHub 账户的用户名时，却提示 <code>prinsss</code> 这个名称 unavailable（我确定它是没被占用的，因为我还能再用这个名字创建组织），不知道是不是触发了内部的什么保留机制。</p>
+<p>最后还是发工单找客服解决了，而且等了一个多星期才回复，也是挺无语的。原来的 <code>printempw</code> 这个名字我也保留了，所以 <a target="_blank" rel="noopener" href="https://printempw.github.io/">printempw.github.io</a> 这个域名还是可以访问的，目前是<a target="_blank" rel="noopener" href="https://github.com/prinsss/prinsss.github.io/blob/source/_config.yml#L148">两边同步更新</a>，后续再慢慢迁移。</p>
+<span id="more"></span>
+<h2 id="github-packages-介绍"><a href="#github-packages-介绍" class="headerlink" title="GitHub Packages 介绍"></a>GitHub Packages 介绍</h2>
+<p>其实最开始知道这个还是因为 Homebrew，看它每次安装软件下载 bottle 时都会从 ghcr.io 这个域名下载。好奇去查了一下，发现原来 GitHub 自己也整了一个软件包仓库，颇有一统天下的味道。</p>
+<p><a target="_blank" rel="noopener" href="https://docs.github.com/en/packages/learn-github-packages/introduction-to-github-packages">GitHub Packages</a> 支持托管 Docker、npm、Maven、NuGet、RubyGems 等软件包，用起来比较像私有库。比起官方 registry 的好处就是其与 GitHub 完全集成，可以把源代码和软件包整合在一起，包括权限管理都可以用 GitHub 的那一套。</p>
+<p>GitHub Packages 对于开源项目完全免费，私有仓库也有一定的<a target="_blank" rel="noopener" href="https://github.com/features/packages#pricing">免费额度</a>。</p>
+<h2 id="手动上传镜像"><a href="#手动上传镜像" class="headerlink" title="手动上传镜像"></a>手动上传镜像</h2>
+<p>基础用法和 Docker Hub 是一样的，只是 namespace 变为了 ghcr.io。</p>
+<p>首先创建一个 PAT (Personal Access Token) 用于后续认证：</p>
+<ul>
+<li>打开 https://github.com/settings/tokens/new?scopes=write:packages</li>
+<li>创建一个 PAT，勾选 <code>write:packages</code> 权限</li>
+</ul>
+<blockquote>
+<p><strong>注意</strong>：如果是在 GitHub Actions 中访问 GitHub Packages，则应该使用 <code>GITHUB_TOKEN</code> 而非 PAT 以提升安全性。后续章节会说明如何在 Actions 中使用 <code>GITHUB_TOKEN</code>。</p>
+</blockquote>
+<p>然后我们就可以用这个 Token 登录镜像仓库了：</p>
+<pre class="bash"><code>export CR_PAT=YOUR_TOKEN
+echo $CR_PAT | docker login ghcr.io -u USERNAME --password-stdin</code></pre>
+<p>尝试一下推送镜像：</p>
+<pre class="bash"><code>docker tag hello-world:latest ghcr.io/prinsss/hello-world:latest
+docker push ghcr.io/prinsss/hello-world:latest</code></pre>
+<p>可以看到已经出现在 GitHub 上了：</p>
+<p><img src="/ghcr-io-with-github-actions/packages-hello-world.png" srcset="/images/loading.jpg" data-srcset="/ghcr-io-with-github-actions/packages-hello-world.png" alt="packages-hello-world" /></p>
+<p>刚上传的镜像默认都是 private，可以在 Package Settings 下方的 <strong>Change package visibility</strong> 处修改为公开镜像。</p>
+<h2 id="自动构建并上传"><a href="#自动构建并上传" class="headerlink" title="自动构建并上传"></a>自动构建并上传</h2>
+<p>连镜像都放 GitHub 上了，那怎么好意思不用 GitHub Actions 呢！</p>
+<p>下面就使用 Actions 实现代码更新后自动构建多架构 Docker 镜像，打 tag 并发布。</p>
+<p>废话不多说，直接贴配置：</p>
+<pre class="yaml"><code># yaml-language-server: $schema=https://json.schemastore.org/github-workflow
+name: Build Docker Image
+
+# 当 push 到 master 分支，或者创建以 v 开头的 tag 时触发，可根据需求修改
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - v*
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE: prinsss/ga-hit-counter
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    # 这里用于定义 GITHUB_TOKEN 的权限
+    permissions:
+      packages: write
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      # 缓存 Docker 镜像以加速构建
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: $&#123;&#123; runner.os &#125;&#125;-buildx-$&#123;&#123; github.sha &#125;&#125;
+          restore-keys: |
+            $&#123;&#123; runner.os &#125;&#125;-buildx-
+
+      # 配置 QEMU 和 buildx 用于多架构镜像的构建
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Inspect builder
+        run: |
+          echo &quot;Name:      $&#123;&#123; steps.buildx.outputs.name &#125;&#125;&quot;
+          echo &quot;Endpoint:  $&#123;&#123; steps.buildx.outputs.endpoint &#125;&#125;&quot;
+          echo &quot;Status:    $&#123;&#123; steps.buildx.outputs.status &#125;&#125;&quot;
+          echo &quot;Flags:     $&#123;&#123; steps.buildx.outputs.flags &#125;&#125;&quot;
+          echo &quot;Platforms: $&#123;&#123; steps.buildx.outputs.platforms &#125;&#125;&quot;
+
+      # 登录到 GitHub Packages 容器仓库
+      # 注意 secrets.GITHUB_TOKEN 不需要手动添加，直接就可以用
+      - name: Log in to the Container registry
+        uses: docker/login-action@v1
+        with:
+          registry: $&#123;&#123; env.REGISTRY &#125;&#125;
+          username: $&#123;&#123; github.actor &#125;&#125;
+          password: $&#123;&#123; secrets.GITHUB_TOKEN &#125;&#125;
+
+      # 根据输入自动生成 tag 和 label 等数据，说明见下
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v3
+        with:
+          images: $&#123;&#123; env.REGISTRY &#125;&#125;/$&#123;&#123; env.IMAGE &#125;&#125;
+
+      # 构建并上传
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile
+          target: production
+          builder: $&#123;&#123; steps.buildx.outputs.name &#125;&#125;
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: $&#123;&#123; steps.meta.outputs.tags &#125;&#125;
+          labels: $&#123;&#123; steps.meta.outputs.labels &#125;&#125;
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+
+      - name: Inspect image
+        run: |
+          docker buildx imagetools inspect \
+          $&#123;&#123; env.REGISTRY &#125;&#125;/$&#123;&#123; env.IMAGE &#125;&#125;:$&#123;&#123; steps.meta.outputs.version &#125;&#125;</code></pre>
+<p>自动构建的效果可以在我的 <a target="_blank" rel="noopener" href="https://github.com/prinsss/google-analytics-hit-counter">GitHub</a> 上查看（其实就是之前写的那个 <a href="https://prinsss.github.io/google-analytics-api-page-views-counter/">使用 Google Analytics API 实现博客阅读量统计</a>）。</p>
+<p>另外有几个需要注意的点：</p>
+<h3 id="上传时出现-400-bad-request"><a href="#上传时出现-400-bad-request" class="headerlink" title="上传时出现 400 Bad Request"></a>上传时出现 400 Bad Request</h3>
+<p>这个昨天搞得我真是一脸懵逼，报错是这样的：</p>
+<pre class="text"><code>#16 exporting to image
+#16 pushing layers 0.5s done
+#16 ERROR: unexpected status: 400 Bad Request
+------
+ &gt; exporting to image:
+------
+error: failed to solve: unexpected status: 400 Bad Request
+Error: buildx failed with: error: failed to solve: unexpected status: 400 Bad Request</code></pre>
+<p>排查了好久，最后发现是我打 tag 的时候忘记加上用户名了，原本是 <code>ghcr.io/prinsss/ga-hit-counter</code> 的，我给打成了 <code>ghcr.io/ga-hit-counter</code>，难怪推不上去（也要吐槽一下这个报错，就一个 400 鬼知道是什么啊）。</p>
+<h3 id="上传时出现-403-forbidden"><a href="#上传时出现-403-forbidden" class="headerlink" title="上传时出现 403 Forbidden"></a>上传时出现 403 Forbidden</h3>
+<p>把上面那个解决了以后，心想这次总该成了吧，结果又来了个 403，我又一脸懵逼：</p>
+<pre class="text"><code>#16 exporting to image
+#16 pushing layers 0.7s done
+#16 ERROR: unexpected status: 403 Forbidden
+------
+ &gt; exporting to image:
+------
+error: failed to solve: unexpected status: 403 Forbidden
+Error: buildx failed with: error: failed to solve: unexpected status: 403 Forbidden</code></pre>
+<p>再一番排查，发现是需要在 Package Settings 中的 <strong>Manage Actions access</strong> 处指定可以访问该软件包的源码仓库（也就是 Actions 所在的仓库）。好吧……</p>
+<p><img src="/ghcr-io-with-github-actions/manage-actions-access.png" srcset="/images/loading.jpg" data-srcset="/ghcr-io-with-github-actions/manage-actions-access.png" alt="manage-actions-access" /></p>
+<p>添加了仓库，这下确实可以了。</p>
+<h3 id="元数据自动生成"><a href="#元数据自动生成" class="headerlink" title="元数据自动生成"></a>元数据自动生成</h3>
+<p><a target="_blank" rel="noopener" href="https://github.com/docker/metadata-action"><code>docker/metadata-action</code></a> 这是一个比较有意思的 action，它可以从源码以及触发构建的 event 中获取数据，自动生成相应的 Docker 镜像 tag 以及 label。（在 GitHub 文档官方的示例中，这是由<a target="_blank" rel="noopener" href="https://docs.github.com/en/packages/managing-github-packages-using-github-actions-workflows/publishing-and-installing-a-package-with-github-actions#upgrading-a-workflow-that-accesses-ghcrio">一段脚本</a>完成的）</p>
+<p>比如默认的效果就是：</p>
+<table>
+<colgroup>
+<col style="width: 21%" />
+<col style="width: 39%" />
+<col style="width: 39%" />
+</colgroup>
+<thead>
+<tr>
+<th>Event</th>
+<th>Ref</th>
+<th>Docker Tags</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pull_request</code></td>
+<td><code>refs/pull/2/merge</code></td>
+<td><code>pr-2</code></td>
+</tr>
+<tr>
+<td><code>push</code></td>
+<td><code>refs/heads/master</code></td>
+<td><code>master</code></td>
+</tr>
+<tr>
+<td><code>push</code></td>
+<td><code>refs/heads/releases/v1</code></td>
+<td><code>releases-v1</code></td>
+</tr>
+<tr>
+<td><code>push tag</code></td>
+<td><code>refs/tags/v1.2.3</code></td>
+<td><code>v1.2.3</code>, <code>latest</code></td>
+</tr>
+<tr>
+<td><code>push tag</code></td>
+<td><code>refs/tags/v2.0.8-beta.67</code></td>
+<td><code>v2.0.8-beta.67</code>, <code>latest</code></td>
+</tr>
+</tbody>
+</table>
+<p>也就是我现在使用的：源码推送到 <code>master</code> 分支则自动构建并更新 <code>master</code> tag 的镜像；在 git 上创建以 <code>v</code> 开头的 tag，Docker 那边也会自动创建相应的 tag 并且更新 <code>latest</code>，不错不错。（不过想想我可能保留一个 tag 触发就够了）</p>
+<p>比如我 push 了一个 <code>v0.2.0</code> 的 tag 上去，自动生成的元数据就是这样的：</p>
+<pre class="text"><code>Run docker/metadata-action@v3
+Context info
+  eventName: push
+  sha: 6071f564087d49be48dc318b89fc22ff96cf6a17
+  ref: refs/tags/v0.2.0
+  workflow: Build Docker Image
+  action: meta
+  actor: prinsss
+  runNumber: 11
+  runId: 1495122573
+Docker tags
+  ghcr.io/prinsss/ga-hit-counter:v0.2.0
+  ghcr.io/prinsss/ga-hit-counter:latest
+Docker labels
+  org.opencontainers.image.title=google-analytics-hit-counter
+  org.opencontainers.image.description=Page views counter that pulls data from Google Analytics API.
+  org.opencontainers.image.url=prinsss/google-analytics-hit-counter
+  org.opencontainers.image.source=prinsss/google-analytics-hit-counter
+  org.opencontainers.image.version=v0.2.0
+  org.opencontainers.image.created=2021-11-23T14:10:35.953Z
+  org.opencontainers.image.revision=6071f564087d49be48dc318b89fc22ff96cf6a17
+  org.opencontainers.image.licenses=MIT</code></pre>
+<p>如果想要修改为其他方案，action 也提供了丰富的配置项，可以自行修改。</p>
+<h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2>
+<p>用 GitHub Packages 托管 Docker 镜像，体验还是挺不错的。硬要说有什么缺点的话就是不好配置国内镜像吧，毕竟大部分国内镜像都是对应 Docker Hub 的。</p>
+<p>另外多架构镜像的这个构建时间也是挺感人，模拟 arm64 一次要六七分钟，哈人。（所以写 Dockerfile 还是挺讲究的，怎么让缓存效率最大化，这方面还得再学习）</p>
+<p>参考链接：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://docs.github.com/en/packages/learn-github-packages/introduction-to-github-packages">Introduction to GitHub Packages - GitHub Docs</a></li>
+<li><a target="_blank" rel="noopener" href="https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry">Working with the Container registry - GitHub Docs</a></li>
+<li><a target="_blank" rel="noopener" href="https://docs.github.com/en/actions/security-guides/automatic-token-authentication">Automatic token authentication - GitHub Docs</a></li>
+<li><a target="_blank" rel="noopener" href="https://docs.github.com/en/packages/managing-github-packages-using-github-actions-workflows/publishing-and-installing-a-package-with-github-actions#upgrading-a-workflow-that-accesses-ghcrio">Publishing and installing a package with GitHub Actions - GitHub Docs</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.community/t/inactive-username-cant-be-claimed/189177">Inactive username can’t be claimed? - GitHub Support Community</a></li>
+</ul>
+<p>题外话，秋招后这段时间我也折腾了一些东西，有空慢慢发出来吧。</p>
+</div>
+    <div class="post-copyright"><p>除另有声明外，本博客文章均采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by/4.0/">知识共享(Creative Commons) 署名 4.0 国际许可协议</a> 进行许可。转载请注明原作者与文章出处。</p></div>
+  </article>
+
+  
+    <nav class="post-nav">
+      
+      <div class="post-nav-item post-nav-prev">上一篇：
+        <a href="/macos-vm-on-m1-mac/">在 M1 Mac 上运行 macOS 虚拟机</a>
+      </div>
+      
+      
+      <div class="post-nav-item post-nav-next">下一篇：
+        <a href="/eslint-prettier-commitlint/">使用 ESLint + Prettier + Commitlint 规范代码风格与提交流程</a>
+      </div>
+      
+    </nav>
+  
+
+  
+    
+
+
+<script src="https://giscus.app/client.js"
+  data-repo="prinsss/prinsss.github.io"
+  data-repo-id="MDEwOlJlcG9zaXRvcnkxMDU3MzY5MTA="
+  data-category="Announcements"
+  data-category-id="DIC_kwDOBk1qzs4CawFb"
+  data-mapping="title"
+  data-strict="1"
+  data-reactions-enabled="1"
+  data-emit-metadata="0"
+  data-input-position="top"
+  data-theme="preferred_color_scheme"
+  data-lang="zh-CN"
+  data-loading="lazy"
+  crossorigin="anonymous"
+  async>
+</script>
+
+
+  
+
+      </section>
+      <aside class="sidebar col-md-3 offset-md-1 col-12">
+        
+  
+  <section class="widget widget-toc">
+    <h3 class="widget-title">文章目录</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#github-packages-%E4%BB%8B%E7%BB%8D"><span class="toc-text">GitHub Packages 介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%89%8B%E5%8A%A8%E4%B8%8A%E4%BC%A0%E9%95%9C%E5%83%8F"><span class="toc-text">手动上传镜像</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%87%AA%E5%8A%A8%E6%9E%84%E5%BB%BA%E5%B9%B6%E4%B8%8A%E4%BC%A0"><span class="toc-text">自动构建并上传</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%8A%E4%BC%A0%E6%97%B6%E5%87%BA%E7%8E%B0-400-bad-request"><span class="toc-text">上传时出现 400 Bad Request</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%8A%E4%BC%A0%E6%97%B6%E5%87%BA%E7%8E%B0-403-forbidden"><span class="toc-text">上传时出现 403 Forbidden</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%83%E6%95%B0%E6%8D%AE%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90"><span class="toc-text">元数据自动生成</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%80%E5%90%8E"><span class="toc-text">最后</span></a></li></ol>
+  </section>
+  
+
+        
+
+
+<section class="widget" id="widget-categories">
+  <h3 class="widget-title">分类</h3>
+  
+  
+    <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/tech/">技术</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/diary/">日常</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/essay/">随笔</a></li></ul>
+  
+</section>
+
+
+
+<section class="widget" id="widget-pages">
+  <h3 class="widget-title">页面</h3>
+  <ul class="menu">
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives/" title="">归档</a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about/" title="">关于我</a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-friends">
+        <a href="/friends/" title="">朋友们</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+<section class="widget" id="widget-links">
+  <h3 class="widget-title">链接</h3>
+  <ul class="menu">
+    
+      
+      <li class="menu-item menu-item-github">
+        <a href="https://github.com/prinsss" title="" target="_blank">GitHub</a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-rss">
+        <a href="/atom.xml" title="" target="_blank">RSS Feed</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+      </aside>
+    </div>
+  </div>
+</main>
+
+<footer>
+  
+  <div class="container">
+    <p>
+      &copy; 2026 <a href="https://prinsss.github.io">PRIN BLOG</a>. Proudly published with
+      <a href="https://hexo.io/" target="_blank">Hexo</a> & <a href="https://github.com/printempw/hexo-theme-murasaki/" target="_blank">Murasaki</a>.
+    </p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/han-css@3.3.0/dist/han.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@10.6.0/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@17.3.1/dist/lazyload.min.js"></script>
+<script>
+  hljs.initHighlightingOnLoad();
+  Han(document.querySelector('section.content')).setRoutine([
+    'initCond', 'renderElem', 'renderJiya', 'correctBasicBD', 'substCombLigaWithPUA'
+    // 'renderHanging', 'renderHWS'
+  ]).render();
+  new LazyLoad({
+    elements_selector: '.post-content img',
+    callback_loaded: function (el) {
+      el.parentNode.nodeName.toLowerCase() === 'a' || mediumZoom(el, { margin: 24 });
+    }
+  });
+</script>
+  <script async src="https://oishii.prin.studio/delicious-party"
+    data-website-id="02075562-9733-4917-8c28-be13173bb1f7">
+  </script>
+
+</body>
+</html>

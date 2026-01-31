@@ -1,0 +1,585 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <title>PRIN BLOG - 半吊子全栈开发者的日常</title>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="HandheldFriendly" content="True" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+<meta name="generator" content="Hexo" />
+<link rel="icon" href="/images/favicon.png" />
+  <link rel="canonical" href="https://prinsss.github.io/page/3/"/>
+  <link rel="alternate" type="application/atom+xml" href="/atom.xml" title="PRIN BLOG">
+  <meta name="keywords" content="prin, prinsss, printempw, blog, 博客, 独立博客" />
+
+<meta name="description" content="这里是 prin 的个人博客，基本上啥都写：开发心得分享，日常吐槽吹水，偶尔也会写点正经文字。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="PRIN BLOG">
+<meta property="og:url" content="https://prinsss.github.io/page/3/index.html">
+<meta property="og:site_name" content="PRIN BLOG">
+<meta property="og:description" content="这里是 prin 的个人博客，基本上啥都写：开发心得分享，日常吐槽吹水，偶尔也会写点正经文字。">
+<meta property="og:locale">
+<meta property="article:author" content="prin">
+<meta name="twitter:card" content="summary">
+  <meta name="google-site-verification" content="GRFMvqszPSgldR5B46PfCl67MehNVagYoA9AtJpd8BA" />
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/han-css@3.3.0/dist/han.min.css">
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Fira+Mono|Roboto+Slab:400,600|Noto+Serif+SC:600&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@10.6.0/styles/atom-one-dark.min.css" media="screen and (prefers-color-scheme: dark)">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@10.6.0/styles/atom-one-light.min.css" media="screen and (prefers-color-scheme: light)">
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/node-tikzjax@latest/css/fonts.css" /><style>.tikzjax { display: block; text-align: center; user-select: none; }</style></head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="site-name">
+      <a class="logo" href="/">PRIN BLOG</a>
+      <span class="description">半吊子全栈开发者的日常</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <div class="row">
+      <section class="content col-md-8 col-12">
+        
+  
+    <article class="post">
+      <h2 class="post-title">
+        <a href="/use-github-actions-to-deploy-hexo-blog/">使用 GitHub Actions 自动部署 Hexo 博客</a>
+      </h2>
+      <div class="post-meta">
+        <span class="post-meta-item post-meta-date">
+  <time datetime="2021-02-07T04:05:38+08:00">2021-02-07</time>
+</span>
+
+<span class="post-meta-item post-meta-categories">
+  <span class="post-meta-item-indicator">Category:</span>
+  
+    <a class="category-link" href="/categories/tech/">技术</a>
+  
+</span>
+
+<span class="post-meta-item post-meta-tags">
+  
+    <a class="tag--link" href="/tag/Hexo/" rel="tag">Hexo</a> <a class="tag--link" href="/tag/%E5%8D%9A%E5%AE%A2/" rel="tag">博客</a>
+  
+</span>
+
+
+<span class="post-meta-item post-meta-views">
+  <span class="pv-counter">loading</span> views
+</span>
+
+
+      </div>
+      <div class="post-content">
+        
+          <p>联动三年前的文章：<a href="https://prinsss.github.io/deploy-hexo-blog-automatically-with-travis-ci/">使用 Travis CI 自动部署 Hexo 博客</a></p>
+<p>今天更新了一下博客，寻思着好歹也改一下页脚的 Copyright 年份，改完 push 上去以后却发现 GitHub Pages 迟迟没有更新。进去 Travis CI 一看，发现任务一直处于 Queued 状态，半小时了都没开始构建。</p>
+<p>查了一下，并不是只有我遇到了类似情况（似乎是因为 Travis CI 正在将 travis-ci.org 迁移至 travis-ci.com）：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://travis-ci.community/t/builds-hang-in-queued-state/10250">Builds hang in queued state</a></li>
+<li><a target="_blank" rel="noopener" href="https://travis-ci.community/t/builds-queuing-for-hours-with-public-git-repo/10351">Builds queuing for hours with public git repo</a></li>
+</ul>
+<p>看了一圈感觉有点悬，干脆换成 GitHub Actions 吧。</p>
+<h2 id="section">
+          <p><a class="more-link" href="/use-github-actions-to-deploy-hexo-blog/#more">&gt; READ MORE...</a></p>
+        
+      </div>
+    </article>
+  
+    <article class="post">
+      <h2 class="post-title">
+        <a href="/campus-network-sharing/">绕过校园网分享限制，构建愉快的宿舍网络环境</a>
+      </h2>
+      <div class="post-meta">
+        <span class="post-meta-item post-meta-date">
+  <time datetime="2020-10-18T16:45:00+08:00">2020-10-18</time>
+</span>
+
+<span class="post-meta-item post-meta-categories">
+  <span class="post-meta-item-indicator">Category:</span>
+  
+    <a class="category-link" href="/categories/tech/">技术</a>
+  
+</span>
+
+<span class="post-meta-item post-meta-tags">
+  
+    <a class="tag--link" href="/tag/%E7%BD%91%E7%BB%9C/" rel="tag">网络</a>
+  
+</span>
+
+
+<span class="post-meta-item post-meta-views">
+  <span class="pv-counter">loading</span> views
+</span>
+
+
+      </div>
+      <div class="post-content">
+        
+          <p>最近大一新生们开学了，就有几位学弟来问我说，咱们学校的校园网要怎么才能开 WiFi 热点、能不能用路由器。回想一下当初我也折腾了好一段时间，本来想水篇博客的，后来不知道怎么的就咕咕咕了……正好借此机会分享一下。</p>
+<p>其实吧，学校有的是办法搞你。除了强制一人一号、恶心的专用拨号客户端防共享以外，还能通过 <a target="_blank" rel="noopener" href="https://www.xavier.wang/post/45-suck-shit-lan/">IPID、TTL、时钟偏移检测</a>，甚至是 DPI 深度包检测的方法来防私接，就看校方做得够不够绝了。当然破解的方法也有，但基本也不会让你好受。如果碰到这样的校园网，推荐你直接躺平，给这种垃圾网络交钱还不如开个无限流量套餐呢。</p>
+<p><strong>免责声明：日后你惹出祸来，不把师父说出来就行了.jpg</strong></p>
+          <p><a class="more-link" href="/campus-network-sharing/#more">&gt; READ MORE...</a></p>
+        
+      </div>
+    </article>
+  
+    <article class="post">
+      <h2 class="post-title">
+        <a href="/airpods-2-are-great/">AirPods 2 到手半个月，我的实际体验如何？</a>
+      </h2>
+      <div class="post-meta">
+        <span class="post-meta-item post-meta-date">
+  <time datetime="2020-09-08T19:51:00+08:00">2020-09-08</time>
+</span>
+
+<span class="post-meta-item post-meta-categories">
+  <span class="post-meta-item-indicator">Category:</span>
+  
+    <a class="category-link" href="/categories/essay/">随笔</a>
+  
+</span>
+
+<span class="post-meta-item post-meta-tags">
+  
+    <a class="tag--link" href="/tag/%E8%80%B3%E6%9C%BA/" rel="tag">耳机</a> <a class="tag--link" href="/tag/%E8%AF%84%E6%B5%8B/" rel="tag">评测</a>
+  
+</span>
+
+
+<span class="post-meta-item post-meta-views">
+  <span class="pv-counter">loading</span> views
+</span>
+
+
+      </div>
+      <div class="post-content">
+        
+          <p>先说好，这不是安利文：我没有推荐任何人购买 AirPods 2 的意思。</p>
+<p>这篇文章仅旨在向各位分享我入手 AirPods 2 后的<strong>真实使用体验</strong>，有吐槽也有真香。</p>
+<p>数码圈有个很奇怪的现象，总有那么些人抢着当「厂商孝子」「精神股东」，批评一句产品好像要了他们的命似的（更好笑的是还会互相扣帽子），对此我实在是难以理解。反正我对数码产品的态度一直都是：喜欢就买，开心就好。</p>
+<p>如果你恰巧在考虑是否要入手 AirPods 2，希望这篇文章能对你有所帮助。</p>
+          <p><a class="more-link" href="/airpods-2-are-great/#more">&gt; READ MORE...</a></p>
+        
+      </div>
+    </article>
+  
+    <article class="post">
+      <h2 class="post-title">
+        <a href="/dont-buy-a-gaming-laptop-for-college/">上大学买游戏本，你可能会后悔</a>
+      </h2>
+      <div class="post-meta">
+        <span class="post-meta-item post-meta-date">
+  <time datetime="2020-09-08T03:50:00+08:00">2020-09-08</time>
+</span>
+
+<span class="post-meta-item post-meta-categories">
+  <span class="post-meta-item-indicator">Category:</span>
+  
+    <a class="category-link" href="/categories/essay/">随笔</a>
+  
+</span>
+
+<span class="post-meta-item post-meta-tags">
+  
+    <a class="tag--link" href="/tag/%E8%B8%A9%E5%9D%91/" rel="tag">踩坑</a>
+  
+</span>
+
+
+<span class="post-meta-item post-meta-views">
+  <span class="pv-counter">loading</span> views
+</span>
+
+
+      </div>
+      <div class="post-content">
+        
+          <p>如果让我回到两年前，我肯定会告诉当时的自己：不要买游戏本。</p>
+<p>好吧我知道，现在都九月份了，准大学生们电脑估计早就到手了，我这里啰嗦几句也没用。虽然估计也没人看，不过就当给以后的同学做个参考吧。</p>
+          <p><a class="more-link" href="/dont-buy-a-gaming-laptop-for-college/#more">&gt; READ MORE...</a></p>
+        
+      </div>
+    </article>
+  
+    <article class="post">
+      <h2 class="post-title">
+        <a href="/the-idolmaster/">THE IDOLM@STER 偶像大师系列个人入坑心得</a>
+      </h2>
+      <div class="post-meta">
+        <span class="post-meta-item post-meta-date">
+  <time datetime="2020-08-02T19:23:00+08:00">2020-08-02</time>
+</span>
+
+<span class="post-meta-item post-meta-categories">
+  <span class="post-meta-item-indicator">Category:</span>
+  
+    <a class="category-link" href="/categories/essay/">随笔</a>
+  
+</span>
+
+<span class="post-meta-item post-meta-tags">
+  
+    <a class="tag--link" href="/tag/ACGN/" rel="tag">ACGN</a>
+  
+</span>
+
+
+<span class="post-meta-item post-meta-views">
+  <span class="pv-counter">loading</span> views
+</span>
+
+
+      </div>
+      <div class="post-content">
+        
+          <p><img src="/the-idolmaster/imas-15th-banner.jpg" srcset="/images/loading.jpg" data-srcset="/the-idolmaster/imas-15th-banner.jpg" alt="imas-15th-banner" /></p>
+<p>说起来我有多久没写过二次元相关的博客了？恰逢爱马仕 15 周年，前几天追着官方生放重温了 2011 版《偶像大师》动画和剧场版，还有 5 场 LIVE BD 看了个爽（拜此所赐睡眠周末时间只有六小时），正好借此机会写点东西。</p>
+<p><del>因为以往的经验告诉我，如果现在拖着不写以后就更写不出来了（</del></p>
+          <p><a class="more-link" href="/the-idolmaster/#more">&gt; READ MORE...</a></p>
+        
+      </div>
+    </article>
+  
+    <article class="post">
+      <h2 class="post-title">
+        <a href="/google-analytics-api-page-views-counter/">使用 Google Analytics API 实现博客阅读量统计</a>
+      </h2>
+      <div class="post-meta">
+        <span class="post-meta-item post-meta-date">
+  <time datetime="2020-03-25T07:07:00+08:00">2020-03-25</time>
+</span>
+
+<span class="post-meta-item post-meta-categories">
+  <span class="post-meta-item-indicator">Category:</span>
+  
+    <a class="category-link" href="/categories/tech/">技术</a>
+  
+</span>
+
+<span class="post-meta-item post-meta-tags">
+  
+    <a class="tag--link" href="/tag/JavaScript/" rel="tag">JavaScript</a> <a class="tag--link" href="/tag/%E5%8D%9A%E5%AE%A2/" rel="tag">博客</a>
+  
+</span>
+
+
+<span class="post-meta-item post-meta-views">
+  <span class="pv-counter">loading</span> views
+</span>
+
+
+      </div>
+      <div class="post-content">
+        
+          <p>前段时间，Google Analytics 给我发了封邮件，说二月份我的博客有 9.3K 的 UV。点进去看了看热门的文章，访问量最多的是「<a href="https://prinsss.github.io/twitter-account-has-been-locked/">Twitter 账号被锁定是种怎样的体验</a>」（17 年的博文了……），其他比较高的还有以前写的教程「<a href="https://prinsss.github.io/windows-terminal-setup-guide/">Windows Terminal 安装与配置指南</a>」「<a href="https://prinsss.github.io/wsl-guide/">WSL 配置指北：打造 Windows 最强命令行</a>」，以及后起之秀「<a href="https://prinsss.github.io/namebase-handshake-airdrop/">记一次 HNS 币空投薅 $500 羊毛的经历</a>」，很真实。</p>
+<p>看着报表上的访问量排名，我突然一寻思，这白花花的数据都在眼前，那能不能利用 GA 里的这些数据，给博客加个访问计数、阅读量统计功能呢？</p>
+          <p><a class="more-link" href="/google-analytics-api-page-views-counter/#more">&gt; READ MORE...</a></p>
+        
+      </div>
+    </article>
+  
+    <article class="post">
+      <h2 class="post-title">
+        <a href="/reverse-proxy-for-126-mail-pop-server/">反向代理解决 Gmail 代收 126 邮箱出现 Connection timed out 的问题</a>
+      </h2>
+      <div class="post-meta">
+        <span class="post-meta-item post-meta-date">
+  <time datetime="2020-03-18T14:27:58+08:00">2020-03-18</time>
+</span>
+
+<span class="post-meta-item post-meta-categories">
+  <span class="post-meta-item-indicator">Category:</span>
+  
+    <a class="category-link" href="/categories/tech/">技术</a>
+  
+</span>
+
+<span class="post-meta-item post-meta-tags">
+  
+    <a class="tag--link" href="/tag/%E8%B8%A9%E5%9D%91/" rel="tag">踩坑</a>
+  
+</span>
+
+
+<span class="post-meta-item post-meta-views">
+  <span class="pv-counter">loading</span> views
+</span>
+
+
+      </div>
+      <div class="post-content">
+        
+          <p>我有很多个电子邮箱地址，并且都设置了转发或者代收到 Gmail 上，方便集中处理。其中看重实时性、邮件需要尽快处理的邮箱地址（比如 <a href="mailto:printempw@gmail.com">printempw#gmail.com</a>）是设置的自动转发规则，其他无关紧要的邮箱则是在 Gmail 上设置了 POP3 代收信（<a target="_blank" rel="noopener" href="https://support.google.com/mail/answer/21289">查收其他帐号的邮件</a>），一直用到现在也没什么问题。</p>
+<p>然而前段时间我却突然发现，Gmail 里收不到网易 126 邮箱里的邮件了。</p>
+          <p><a class="more-link" href="/reverse-proxy-for-126-mail-pop-server/#more">&gt; READ MORE...</a></p>
+        
+      </div>
+    </article>
+  
+    <article class="post">
+      <h2 class="post-title">
+        <a href="/short-domain-name-for-blog/">博客短域名 printem.pw 和 prin.studio</a>
+      </h2>
+      <div class="post-meta">
+        <span class="post-meta-item post-meta-date">
+  <time datetime="2020-03-15T19:22:00+08:00">2020-03-15</time>
+</span>
+
+<span class="post-meta-item post-meta-categories">
+  <span class="post-meta-item-indicator">Category:</span>
+  
+    <a class="category-link" href="/categories/diary/">日常</a>
+  
+</span>
+
+<span class="post-meta-item post-meta-tags">
+  
+    <a class="tag--link" href="/tag/%E5%8D%9A%E5%AE%A2/" rel="tag">博客</a>
+  
+</span>
+
+
+<span class="post-meta-item post-meta-views">
+  <span class="pv-counter">loading</span> views
+</span>
+
+
+      </div>
+      <div class="post-content">
+        
+          <p>前几天在 Twitter 上看到一个「<a target="_blank" rel="noopener" href="https://github.com/timqian/chinese-independent-blogs">中文独立博客列表</a>」，点进去观摩了一下大佬们，然而正当我准备关掉页面时，看到项目的 README 底部赫然写着：</p>
+<pre class="markdown"><code>## 什么是独立博客
+
+- 拥有自己的域名
+- 作者本人原创内容</code></pre>
+<p>且不说这定义是否准确，我就琢磨，我这 <code>github.io</code>，配当独立博客不？</p>
+          <p><a class="more-link" href="/short-domain-name-for-blog/#more">&gt; READ MORE...</a></p>
+        
+      </div>
+    </article>
+  
+    <article class="post">
+      <h2 class="post-title">
+        <a href="/deal-with-manjaro-19-package-changes/">处理 Manjaro 19.0 升级中的软件包变更</a>
+      </h2>
+      <div class="post-meta">
+        <span class="post-meta-item post-meta-date">
+  <time datetime="2020-02-29T12:47:00+08:00">2020-02-29</time>
+</span>
+
+<span class="post-meta-item post-meta-categories">
+  <span class="post-meta-item-indicator">Category:</span>
+  
+    <a class="category-link" href="/categories/tech/">技术</a>
+  
+</span>
+
+<span class="post-meta-item post-meta-tags">
+  
+    <a class="tag--link" href="/tag/Linux/" rel="tag">Linux</a>
+  
+</span>
+
+
+<span class="post-meta-item post-meta-views">
+  <span class="pv-counter">loading</span> views
+</span>
+
+
+      </div>
+      <div class="post-content">
+        
+          <p>看到这标题你可能会觉得奇怪，Manjaro 不是滚动更新的发行版吗？<code>pacman -Syu</code> 一下就完事儿了，这有什么好写的。</p>
+<p>其实不然。就算你一路滚上来所有包都是最新版本，也不代表你机器上的软件包就和最新的 ISO 一致了。</p>
+          <p><a class="more-link" href="/deal-with-manjaro-19-package-changes/#more">&gt; READ MORE...</a></p>
+        
+      </div>
+    </article>
+  
+    <article class="post">
+      <h2 class="post-title">
+        <a href="/nautilus-open-in-guake-terminal/">Nautilus 添加 Open in Guake 右键菜单</a>
+      </h2>
+      <div class="post-meta">
+        <span class="post-meta-item post-meta-date">
+  <time datetime="2020-02-24T04:22:00+08:00">2020-02-24</time>
+</span>
+
+<span class="post-meta-item post-meta-categories">
+  <span class="post-meta-item-indicator">Category:</span>
+  
+    <a class="category-link" href="/categories/tech/">技术</a>
+  
+</span>
+
+<span class="post-meta-item post-meta-tags">
+  
+    <a class="tag--link" href="/tag/Linux/" rel="tag">Linux</a> <a class="tag--link" href="/tag/%E5%91%BD%E4%BB%A4%E8%A1%8C/" rel="tag">命令行</a>
+  
+</span>
+
+
+<span class="post-meta-item post-meta-views">
+  <span class="pv-counter">loading</span> views
+</span>
+
+
+      </div>
+      <div class="post-content">
+        
+          <p>自从前段时间开始使用 <a target="_blank" rel="noopener" href="https://github.com/Guake/guake">Guake</a> <del>挂科</del>后，这个下拉式的终端模拟器可谓是深得我心，基本上就没其他终端什么事儿了。快捷键呼之即来挥之即去，设置成半透明背景后呼出占半屏也不遮挡其他窗口，各方面都很优秀。</p>
+<p>不过在 GNOME 桌面默认的 Nautilus 文件浏览器里，「在终端中打开」右键菜单打开的还是 GNOME Terminal，得想个办法把它改成「在 Guake 中打开」。</p>
+          <p><a class="more-link" href="/nautilus-open-in-guake-terminal/#more">&gt; READ MORE...</a></p>
+        
+      </div>
+    </article>
+  
+
+  <nav class="pagination">
+  <a class="extend prev" rel="prev" href="/page/2/">Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/page/14/">14</a><a class="extend next" rel="next" href="/page/4/">Next</a>
+</nav>
+
+
+      </section>
+      <aside class="sidebar col-md-3 offset-md-1 col-12">
+        
+        
+<section class="widget" id="widget-recent-posts">
+  <h3 class="widget-title">最新文章</h3>
+  <ul class="menu">
+    
+    
+    
+    
+      <li class="menu-item">
+        <a href="/synology-disk-compatibility-fix/">修复 Synology NAS 升级后 M.2 存储池兼容性问题</a>
+      </li>
+    
+      <li class="menu-item">
+        <a href="/zspace-qnap-nas-shared-nut-ups/">极空间与 QNAP NAS 实现共享 NUT UPS</a>
+      </li>
+    
+      <li class="menu-item">
+        <a href="/building-blog-friend-circle/">重构博客友链页面 & 友链朋友圈开源</a>
+      </li>
+    
+      <li class="menu-item">
+        <a href="/react-unstable-nested-components/">真的不可以在 React 组件内部嵌套定义子组件吗？</a>
+      </li>
+    
+      <li class="menu-item">
+        <a href="/graphics-with-tikz-in-hexo/">使用 TikZ 在 Hexo 博客中愉快地画图</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+<section class="widget" id="widget-categories">
+  <h3 class="widget-title">分类</h3>
+  
+  
+    <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/tech/">技术</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/diary/">日常</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/essay/">随笔</a></li></ul>
+  
+</section>
+
+
+
+<section class="widget" id="widget-pages">
+  <h3 class="widget-title">页面</h3>
+  <ul class="menu">
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives/" title="">归档</a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about/" title="">关于我</a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-friends">
+        <a href="/friends/" title="">朋友们</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+<section class="widget" id="widget-links">
+  <h3 class="widget-title">链接</h3>
+  <ul class="menu">
+    
+      
+      <li class="menu-item menu-item-github">
+        <a href="https://github.com/prinsss" title="" target="_blank">GitHub</a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-rss">
+        <a href="/atom.xml" title="" target="_blank">RSS Feed</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+<section class="widget" id="widget-tagcloud">
+  <h3 class="widget-title">标签云</h3>
+  <a href="/tag/ACGN/" style="font-size: 17.86px;">ACGN</a> <a href="/tag/Android/" style="font-size: 15px;">Android</a> <a href="/tag/Apple/" style="font-size: 10.71px;">Apple</a> <a href="/tag/C/" style="font-size: 10.71px;">C++</a> <a href="/tag/CSS/" style="font-size: 11.43px;">CSS</a> <a href="/tag/Docker/" style="font-size: 11.43px;">Docker</a> <a href="/tag/GFW/" style="font-size: 15.71px;">GFW</a> <a href="/tag/Ghost/" style="font-size: 12.86px;">Ghost</a> <a href="/tag/Git/" style="font-size: 10.71px;">Git</a> <a href="/tag/Hexo/" style="font-size: 15px;">Hexo</a> <a href="/tag/JavaScript/" style="font-size: 16.43px;">JavaScript</a> <a href="/tag/LaTeX/" style="font-size: 10px;">LaTeX</a> <a href="/tag/Laravel/" style="font-size: 17.86px;">Laravel</a> <a href="/tag/Linux/" style="font-size: 17.14px;">Linux</a> <a href="/tag/Mac/" style="font-size: 10.71px;">Mac</a> <a href="/tag/Minecraft/" style="font-size: 13.57px;">Minecraft</a> <a href="/tag/NAS/" style="font-size: 10.71px;">NAS</a> <a href="/tag/Nginx/" style="font-size: 12.86px;">Nginx</a> <a href="/tag/OpenWrt/" style="font-size: 10.71px;">OpenWrt</a> <a href="/tag/PHP/" style="font-size: 18.57px;">PHP</a> <a href="/tag/Python/" style="font-size: 12.14px;">Python</a> <a href="/tag/RSS/" style="font-size: 11.43px;">RSS</a> <a href="/tag/React/" style="font-size: 10.71px;">React</a> <a href="/tag/SSL/" style="font-size: 15px;">SSL</a> <a href="/tag/Sublime/" style="font-size: 11.43px;">Sublime</a> <a href="/tag/UserScript/" style="font-size: 10.71px;">UserScript</a> <a href="/tag/VPS/" style="font-size: 17.14px;">VPS</a> <a href="/tag/VSCode/" style="font-size: 10.71px;">VSCode</a> <a href="/tag/VTuber/" style="font-size: 10px;">VTuber</a> <a href="/tag/WebGL/" style="font-size: 10px;">WebGL</a> <a href="/tag/Windows/" style="font-size: 14.29px;">Windows</a> <a href="/tag/WordPress/" style="font-size: 17.14px;">WordPress</a> <a href="/tag/%E5%88%86%E4%BA%AB/" style="font-size: 17.86px;">分享</a> <a href="/tag/%E5%89%8D%E7%AB%AF/" style="font-size: 17.86px;">前端</a> <a href="/tag/%E5%8C%BA%E5%9D%97%E9%93%BE/" style="font-size: 10px;">区块链</a> <a href="/tag/%E5%8D%9A%E5%AE%A2/" style="font-size: 20px;">博客</a> <a href="/tag/%E5%91%BD%E4%BB%A4%E8%A1%8C/" style="font-size: 15.71px;">命令行</a> <a href="/tag/%E5%AD%97%E4%BD%93/" style="font-size: 12.14px;">字体</a> <a href="/tag/%E5%AE%89%E5%88%A9/" style="font-size: 10.71px;">安利</a> <a href="/tag/%E5%B9%B4%E5%BA%A6%E6%80%BB%E7%BB%93/" style="font-size: 11.43px;">年度总结</a> <a href="/tag/%E6%95%99%E7%A8%8B/" style="font-size: 10.71px;">教程</a> <a href="/tag/%E6%B0%B4/" style="font-size: 10.71px;">水</a> <a href="/tag/%E7%89%A9%E8%81%94%E7%BD%91/" style="font-size: 10px;">物联网</a> <a href="/tag/%E7%AC%94%E8%AE%B0/" style="font-size: 10.71px;">笔记</a> <a href="/tag/%E7%BD%91%E7%BB%9C/" style="font-size: 12.86px;">网络</a> <a href="/tag/%E8%80%B3%E6%9C%BA/" style="font-size: 12.86px;">耳机</a> <a href="/tag/%E8%AF%84%E6%B5%8B/" style="font-size: 11.43px;">评测</a> <a href="/tag/%E8%B8%A9%E5%9D%91/" style="font-size: 19.29px;">踩坑</a> <a href="/tag/%E8%BF%90%E7%BB%B4/" style="font-size: 13.57px;">运维</a> <a href="/tag/%E9%9F%B3%E8%A7%86%E9%A2%91/" style="font-size: 14.29px;">音视频</a>
+</section>
+
+
+      </aside>
+    </div>
+  </div>
+</main>
+
+<footer>
+  
+  <div class="container">
+    <p>
+      &copy; 2026 <a href="https://prinsss.github.io">PRIN BLOG</a>. Proudly published with
+      <a href="https://hexo.io/" target="_blank">Hexo</a> & <a href="https://github.com/printempw/hexo-theme-murasaki/" target="_blank">Murasaki</a>.
+    </p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/han-css@3.3.0/dist/han.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@10.6.0/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@17.3.1/dist/lazyload.min.js"></script>
+<script>
+  hljs.initHighlightingOnLoad();
+  Han(document.querySelector('section.content')).setRoutine([
+    'initCond', 'renderElem', 'renderJiya', 'correctBasicBD', 'substCombLigaWithPUA'
+    // 'renderHanging', 'renderHWS'
+  ]).render();
+  new LazyLoad({
+    elements_selector: '.post-content img',
+    callback_loaded: function (el) {
+      el.parentNode.nodeName.toLowerCase() === 'a' || mediumZoom(el, { margin: 24 });
+    }
+  });
+</script>
+  <script async src="https://oishii.prin.studio/delicious-party"
+    data-website-id="02075562-9733-4917-8c28-be13173bb1f7">
+  </script>
+
+</body>
+</html>

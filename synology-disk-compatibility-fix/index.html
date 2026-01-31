@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <title>修复 Synology NAS 升级后 M.2 存储池兼容性问题 - PRIN BLOG</title>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="HandheldFriendly" content="True" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+<meta name="generator" content="Hexo" />
+<link rel="icon" href="/images/favicon.png" />
+  <link rel="canonical" href="https://prinsss.github.io/synology-disk-compatibility-fix/"/>
+  <link rel="alternate" type="application/atom+xml" href="/atom.xml" title="PRIN BLOG">
+  <meta name="keywords" content="NAS,笔记," />
+
+<meta name="description" content="我的主力 NAS 是 Synology 群晖 DS920+，陪了我也快 4 年了。DS920+ 出厂默认是不支持将 M.2 NVMe SSD 作为存储池的，只能作为缓存使用。后来出的 DS923+ 倒是支持创建 M.2 存储池了，但是只能用它自家的兼容性列表中的盘，也不知道套的哪家 OEM，贵得要死，买是不可能买的这辈子不可能买的。 好在有大神写了脚本 Synology_HDD_db，可以直接修改">
+<meta property="og:type" content="article">
+<meta property="og:title" content="修复 Synology NAS 升级后 M.2 存储池兼容性问题">
+<meta property="og:url" content="https://prinsss.github.io/synology-disk-compatibility-fix/index.html">
+<meta property="og:site_name" content="PRIN BLOG">
+<meta property="og:description" content="我的主力 NAS 是 Synology 群晖 DS920+，陪了我也快 4 年了。DS920+ 出厂默认是不支持将 M.2 NVMe SSD 作为存储池的，只能作为缓存使用。后来出的 DS923+ 倒是支持创建 M.2 存储池了，但是只能用它自家的兼容性列表中的盘，也不知道套的哪家 OEM，贵得要死，买是不可能买的这辈子不可能买的。 好在有大神写了脚本 Synology_HDD_db，可以直接修改">
+<meta property="og:locale">
+<meta property="og:image" content="https://prinsss.github.io/synology-disk-compatibility-fix/synology-beeping.jpg">
+<meta property="og:image" content="https://prinsss.github.io/synology-disk-compatibility-fix/storage-pool-failure.jpg">
+<meta property="og:image" content="https://prinsss.github.io/synology-disk-compatibility-fix/syno-hdd-db.jpg">
+<meta property="og:image" content="https://prinsss.github.io/synology-disk-compatibility-fix/dsm-online-assemble.jpg">
+<meta property="article:published_time" content="2026-02-01T00:00:00.000Z">
+<meta property="article:modified_time" content="2026-02-01T00:00:00.000Z">
+<meta property="article:author" content="prin">
+<meta property="article:tag" content="NAS">
+<meta property="article:tag" content="笔记">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://prinsss.github.io/synology-disk-compatibility-fix/synology-beeping.jpg">
+  <meta name="google-site-verification" content="GRFMvqszPSgldR5B46PfCl67MehNVagYoA9AtJpd8BA" />
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/han-css@3.3.0/dist/han.min.css">
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Fira+Mono|Roboto+Slab:400,600|Noto+Serif+SC:600&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@10.6.0/styles/atom-one-dark.min.css" media="screen and (prefers-color-scheme: dark)">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@10.6.0/styles/atom-one-light.min.css" media="screen and (prefers-color-scheme: light)">
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/node-tikzjax@latest/css/fonts.css" /><style>.tikzjax { display: block; text-align: center; user-select: none; }</style></head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="site-name">
+      <a class="logo" href="/">PRIN BLOG</a>
+      <span class="description">半吊子全栈开发者的日常</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <div class="row">
+      <section class="content col-md-8 col-12">
+        
+  <article>
+    <h1 class="post-title">
+      <a href="/synology-disk-compatibility-fix/">修复 Synology NAS 升级后 M.2 存储池兼容性问题</a>
+    </h1>
+    <div class="post-meta">
+      <span class="post-meta-item post-meta-date">
+  <time datetime="2026-02-01T08:00:00+08:00">2026-02-01</time>
+</span>
+
+<span class="post-meta-item post-meta-categories">
+  <span class="post-meta-item-indicator">Category:</span>
+  
+    <a class="category-link" href="/categories/tech/">技术</a>
+  
+</span>
+
+<span class="post-meta-item post-meta-tags">
+  
+    <a class="tag--link" href="/tag/NAS/" rel="tag">NAS</a> <a class="tag--link" href="/tag/%E7%AC%94%E8%AE%B0/" rel="tag">笔记</a>
+  
+</span>
+
+
+<span class="post-meta-item post-meta-views">
+  <span class="pv-counter">loading</span> views
+</span>
+
+
+    </div>
+
+    
+      <script src="https://cdn.jsdelivr.net/npm/dayjs@1.10.4/dayjs.min.js"></script>
+<script>
+  var post_updated = dayjs("2026-02-01T00:00:00.000Z");
+  var days_diff_now = dayjs().diff(post_updated, 'days');
+
+  if (days_diff_now > 365) {
+    document.write(
+      '<div class="post-warning">'+
+        '本文最后修订于 '+days_diff_now+' 天前（'+post_updated.format('YYYY-MM-DD')+'），'+
+        '其中的信息可能已经有所发展或者不再适用于现阶段。'+
+      '</div>'
+    );
+  }
+</script>
+
+    
+
+    
+      <div class="post-toc"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9B%B4%E6%96%B0%E7%A1%AC%E7%9B%98%E5%85%BC%E5%AE%B9%E6%80%A7%E6%95%B0%E6%8D%AE%E5%BA%93"><span class="toc-text">更新硬盘兼容性数据库</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BB%BA%E7%AB%8B-m.2-ssd-%E5%AD%98%E5%82%A8%E6%B1%A0"><span class="toc-text">建立 M.2 SSD 存储池</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B0%8F%E5%B0%BE%E5%B7%B4"><span class="toc-text">小尾巴</span></a></li></ol></div>
+    
+
+    <div class="post-content"><p>我的主力 NAS 是 Synology 群晖 DS920+，陪了我也快 4 年了。DS920+ 出厂默认是不支持将 M.2 NVMe SSD 作为存储池的，只能作为缓存使用。后来出的 DS923+ 倒是支持创建 M.2 存储池了，但是只能用它自家的<a target="_blank" rel="noopener" href="https://www.synology.cn/zh-cn/compatibility?search_by=drives&amp;model=DS923%2B&amp;category=m2_ssd_internal">兼容性列表</a>中的盘，也不知道套的哪家 OEM，贵得要死，买是不可能买的这辈子不可能买的。</p>
+<p>好在有大神写了脚本 <a target="_blank" rel="noopener" href="https://github.com/007revad/Synology_HDD_db">Synology_HDD_db</a>，可以直接修改这个「兼容性列表」所在的数据库，把你在用的硬盘型号加进去。系统一读这个数据库发现型号在里面，就可以正常使用了。不过缺点是每次系统更新后，都需要重新执行一遍脚本。</p>
+<p>今天看到关于 <a target="_blank" rel="noopener" href="http://archive.today/02RKX">飞牛 fnOS 0day 漏洞</a> 的帖子，寻思着也给 DS920+ 更新一下系统，毕竟一直都稳定运行着，也没有特意去升级。虽然我没用飞牛，也没有把服务暴露到公网，不过各家 NAS 系统的 CVE 其实都挺多的，以防万一嘛。</p>
+<p>结果升级完系统 NAS 就开始疯狂嘀嘀嘀叫，才想起来还有硬盘兼容性这一茬……太久远了，顺手记录一下，免得下次再忘了。</p>
+<span id="more"></span>
+<hr />
+<p>报错界面是这样的：</p>
+<ul>
+<li>当前发出哔声的原因：存储空间或 SSD 缓存异常</li>
+<li>检测到不支持的硬盘（缓存设备 2）</li>
+<li>在存储池 3 中检测到一个或多个硬盘缺失</li>
+<li>严重 存储池 3 发生问题</li>
+<li>缓存设备 2 - M.2 NVMe SSD 不受当前 DSM 版本支持</li>
+</ul>
+<p><img src="/synology-disk-compatibility-fix/synology-beeping.jpg" srcset="/images/loading.jpg" data-srcset="/synology-disk-compatibility-fix/synology-beeping.jpg" alt="synology-beeping" /></p>
+<p><img src="/synology-disk-compatibility-fix/storage-pool-failure.jpg" srcset="/images/loading.jpg" data-srcset="/synology-disk-compatibility-fix/storage-pool-failure.jpg" alt="storage-pool-failure" /></p>
+<h2 id="更新硬盘兼容性数据库"><a href="#更新硬盘兼容性数据库" class="headerlink" title="更新硬盘兼容性数据库"></a>更新硬盘兼容性数据库</h2>
+<p>这个 M.2 存储池是 2023 年建的，记得当时好像还不需要捣鼓什么兼容性数据库，应该是后来 DSM 7 加上的。</p>
+<p>总之就是运行一下 <a target="_blank" rel="noopener" href="https://github.com/007revad/Synology_HDD_db">Synology_HDD_db</a> 这个脚本，每次系统更新完都要跑一遍，然后重启设备生效。</p>
+<pre class="bash"><code># 版本号自己改成最新的
+wget https://github.com/007revad/Synology_HDD_db/archive/refs/tags/v3.6.119.zip
+7z x v3.6.119.zip
+cd Synology_HDD_db-3.6.119
+
+sudo -s ./syno_hdd_db.sh -nr --showedits
+# 用到的脚本参数：
+# -n, --noupdate        Prevent DSM updating the compatible drive databases
+# -r, --ram             Disable memory compatibility checking (DSM 7.x only)
+# -s, --showedits       Show edits made to &lt;model&gt;_host db and db.new file(s)</code></pre>
+<p>比如我这里用的就是一条致态的 2TB 作为下载盘，另一条 256GB 的作为 HDD 缓存。</p>
+<p><img src="/synology-disk-compatibility-fix/syno-hdd-db.jpg" srcset="/images/loading.jpg" data-srcset="/synology-disk-compatibility-fix/syno-hdd-db.jpg" alt="syno-hdd-db" /></p>
+<p>脚本运行以后，就会把你目前插着的硬盘加到 NAS 本地的兼容性列表数据库里了。</p>
+<pre class="bash"><code>ls -al /var/lib/disk-compatibility/ | grep ds920+_host_v7
+# -rw-r--r--  1 root root 156K Feb  1 02:07 ds920+_host_v7.db
+# -rw-r--r--  1 root root 148K Jan 19 17:11 ds920+_host_v7.db.bak
+# -rw-r--r--  1 root root  97K Oct 27  2023 ds920+_host_v7.db.new.bak
+# -rw-r--r--  1 root root    8 Jan 19 17:11 ds920+_host_v7.release
+# -rw-r--r--  1 root root    4 Jan 19 17:11 ds920+_host_v7.version
+
+cat /var/lib/disk-compatibility/ds920+_host_v7.db | jq .</code></pre>
+<p>所谓数据库，其实就是个大 JSON：</p>
+<pre class="jsonc"><code>&#123;
+  &quot;disk_compatbility_info&quot;: &#123;
+    // ...
+    &quot;ZHITAI TiPlus7100 2TB&quot;: &#123;
+      &quot;ZTA22002&quot;: &#123;
+        &quot;compatibility_interval&quot;: [
+          &#123;
+            &quot;compatibility&quot;: &quot;support&quot;,
+            &quot;not_yet_rolling_status&quot;: &quot;support&quot;,
+            &quot;fw_dsm_update_status_notify&quot;: false,
+            &quot;barebone_installable&quot;: true,
+            &quot;barebone_installable_v2&quot;: &quot;auto&quot;,
+            &quot;smart_test_ignore&quot;: false,
+            &quot;smart_attr_ignore&quot;: false
+          &#125;
+        ]
+      &#125;,
+      // ...
+    &#125;
+  &#125;,
+  &quot;nas_model&quot;: &quot;ds920+&quot;
+&#125;</code></pre>
+<h2 id="建立-m.2-ssd-存储池"><a href="#建立-m.2-ssd-存储池" class="headerlink" title="建立 M.2 SSD 存储池"></a>建立 M.2 SSD 存储池</h2>
+<p>如果是 DS923+，运行完上面的脚本之后应该直接在 DSM Web UI 上创建存储池就可以了。</p>
+<p>DS920+ 还是得自己手搓，记录一下用到的命令（之前参考的是 <a target="_blank" rel="noopener" href="https://blog.sylo.space/use-nvme-ssd-as-storage-volume-instead-of-cache-in-ds920/">这篇博客</a>）：</p>
+<pre class="bash"><code># 查看当前的 NVMe 设备，找到你要的 SSD
+ls -al /dev/nvme*
+sudo fdisk -l /dev/nvme0n1
+
+# 给 SSD 分区，有多块盘的话小心别弄错了
+sudo synopartition --part /dev/nvme0n1 12
+
+# 看看当前的 RAID 状态，如果已经有 md5 了就新建 md6
+cat /proc/mdstat
+sudo mdadm --create /dev/md6 --level=1 --raid-devices=1 --force /dev/nvme0n1p3
+
+# 创建文件系统
+sudo mkfs.btrfs -f /dev/md6
+
+sudo mdadm --detail /dev/md6
+sudo reboot</code></pre>
+<p>重启 NAS 后，检查一下：</p>
+<pre class="bash"><code>sudo fdisk -l /dev/nvme0n1
+# Disk /dev/nvme0n1: 1.9 TiB, 2048408248320 bytes, 4000797360 sectors
+# Disk model: ZHITAI TiPlus7100 2TB
+# Units: sectors of 1 * 512 = 512 bytes
+# Sector size (logical/physical): 512 bytes / 512 bytes
+# I/O size (minimum/optimal): 512 bytes / 512 bytes
+# Disklabel type: dos
+# Disk identifier: 0xae2a9134
+
+# Device         Boot   Start        End    Sectors  Size Id Type
+# /dev/nvme0n1p1          256    4980735    4980480  2.4G fd Linux raid autodetect
+# /dev/nvme0n1p2      4980736    9175039    4194304    2G fd Linux raid autodetect
+# /dev/nvme0n1p3      9437184 4000795469 3991358286  1.9T fd Linux raid autodetect
+
+sudo mdadm --detail /dev/md6
+# /dev/md6:
+#         Version : 1.2
+#   Creation Time : Fri Jun  2 02:16:39 2023
+#      Raid Level : raid1
+#      Array Size : 1995678080 (1903.23 GiB 2043.57 GB)
+#   Used Dev Size : 1995678080 (1903.23 GiB 2043.57 GB)
+#    Raid Devices : 1
+#   Total Devices : 1
+#     Persistence : Superblock is persistent
+
+#     Update Time : Sun Feb  1 03:25:45 2026
+#           State : clean
+#  Active Devices : 1
+# Working Devices : 1
+#  Failed Devices : 0
+#   Spare Devices : 0
+
+#            Name : localhost:6  (local to host localhost)
+#            UUID : 2729425e:28782224:04f5d205:be6fcc6c
+#          Events : 45
+
+#     Number   Major   Minor   RaidDevice State
+#        0     259        3        0      active sync   /dev/nvme0n1p3</code></pre>
+<p>然后去 Web UI 的「存储管理器 &gt; 存储空间 &gt; 可用池」，点击「在线重组」就好了。</p>
+<p><img src="/synology-disk-compatibility-fix/dsm-online-assemble.jpg" srcset="/images/loading.jpg" data-srcset="/synology-disk-compatibility-fix/dsm-online-assemble.jpg" alt="dsm-online-assemble" /></p>
+<h2 id="小尾巴"><a href="#小尾巴" class="headerlink" title="小尾巴"></a>小尾巴</h2>
+<p>顺便吐槽一下，这系统升级完把我所有的容器都停了，也不给我自动重启，我还得一个一个过去 <code>docker compose up -d</code> 拉起来……</p>
+<p>下次有空的话聊聊 HomeLab 的安全性问题：不仅仅是这次飞牛 fnOS 的<a target="_blank" rel="noopener" href="https://www.v2ex.com/t/1189672">路径穿越漏洞</a>，还有之前影响到多个 self-hosted 软件乃至众多生产环境的 <a target="_blank" rel="noopener" href="https://github.com/umami-software/umami/issues/3829">React Server Component RCE 漏洞</a>，claude-relay-service 的<a target="_blank" rel="noopener" href="https://github.com/Wei-Shaw/claude-relay-service/commit/982cca10206b6729e837d73ac79a0d76e81fcc67">鉴权绕过漏洞</a>等等，都说明了把内网服务暴露到公网是极其危险的。很多人图方便喜欢搞什么内网穿透、DDNS、公网 IP、域名访问、DMZ、UPnP，殊不知距离被入侵可能只有一步之遥。</p>
+</div>
+    <div class="post-copyright"><p>除另有声明外，本博客文章均采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by/4.0/">知识共享(Creative Commons) 署名 4.0 国际许可协议</a> 进行许可。转载请注明原作者与文章出处。</p></div>
+  </article>
+
+  
+    <nav class="post-nav">
+      
+      
+      <div class="post-nav-item post-nav-next">下一篇：
+        <a href="/zspace-qnap-nas-shared-nut-ups/">极空间与 QNAP NAS 实现共享 NUT UPS</a>
+      </div>
+      
+    </nav>
+  
+
+  
+    
+
+
+<script src="https://giscus.app/client.js"
+  data-repo="prinsss/prinsss.github.io"
+  data-repo-id="MDEwOlJlcG9zaXRvcnkxMDU3MzY5MTA="
+  data-category="Announcements"
+  data-category-id="DIC_kwDOBk1qzs4CawFb"
+  data-mapping="title"
+  data-strict="1"
+  data-reactions-enabled="1"
+  data-emit-metadata="0"
+  data-input-position="top"
+  data-theme="preferred_color_scheme"
+  data-lang="zh-CN"
+  data-loading="lazy"
+  crossorigin="anonymous"
+  async>
+</script>
+
+
+  
+
+      </section>
+      <aside class="sidebar col-md-3 offset-md-1 col-12">
+        
+  
+  <section class="widget widget-toc">
+    <h3 class="widget-title">文章目录</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9B%B4%E6%96%B0%E7%A1%AC%E7%9B%98%E5%85%BC%E5%AE%B9%E6%80%A7%E6%95%B0%E6%8D%AE%E5%BA%93"><span class="toc-text">更新硬盘兼容性数据库</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BB%BA%E7%AB%8B-m.2-ssd-%E5%AD%98%E5%82%A8%E6%B1%A0"><span class="toc-text">建立 M.2 SSD 存储池</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B0%8F%E5%B0%BE%E5%B7%B4"><span class="toc-text">小尾巴</span></a></li></ol>
+  </section>
+  
+
+        
+
+
+<section class="widget" id="widget-categories">
+  <h3 class="widget-title">分类</h3>
+  
+  
+    <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/tech/">技术</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/diary/">日常</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/essay/">随笔</a></li></ul>
+  
+</section>
+
+
+
+<section class="widget" id="widget-pages">
+  <h3 class="widget-title">页面</h3>
+  <ul class="menu">
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives/" title="">归档</a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about/" title="">关于我</a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-friends">
+        <a href="/friends/" title="">朋友们</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+<section class="widget" id="widget-links">
+  <h3 class="widget-title">链接</h3>
+  <ul class="menu">
+    
+      
+      <li class="menu-item menu-item-github">
+        <a href="https://github.com/prinsss" title="" target="_blank">GitHub</a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-rss">
+        <a href="/atom.xml" title="" target="_blank">RSS Feed</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+      </aside>
+    </div>
+  </div>
+</main>
+
+<footer>
+  
+  <div class="container">
+    <p>
+      &copy; 2026 <a href="https://prinsss.github.io">PRIN BLOG</a>. Proudly published with
+      <a href="https://hexo.io/" target="_blank">Hexo</a> & <a href="https://github.com/printempw/hexo-theme-murasaki/" target="_blank">Murasaki</a>.
+    </p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/han-css@3.3.0/dist/han.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@10.6.0/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@17.3.1/dist/lazyload.min.js"></script>
+<script>
+  hljs.initHighlightingOnLoad();
+  Han(document.querySelector('section.content')).setRoutine([
+    'initCond', 'renderElem', 'renderJiya', 'correctBasicBD', 'substCombLigaWithPUA'
+    // 'renderHanging', 'renderHWS'
+  ]).render();
+  new LazyLoad({
+    elements_selector: '.post-content img',
+    callback_loaded: function (el) {
+      el.parentNode.nodeName.toLowerCase() === 'a' || mediumZoom(el, { margin: 24 });
+    }
+  });
+</script>
+  <script async src="https://oishii.prin.studio/delicious-party"
+    data-website-id="02075562-9733-4917-8c28-be13173bb1f7">
+  </script>
+
+</body>
+</html>

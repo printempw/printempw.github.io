@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <title>React 入门：实现基本登录注册功能 - PRIN BLOG</title>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="HandheldFriendly" content="True" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+<meta name="generator" content="Hexo" />
+<link rel="icon" href="/images/favicon.png" />
+  <link rel="canonical" href="https://prinsss.github.io/react-login-sign-up/"/>
+  <link rel="alternate" type="application/atom+xml" href="/atom.xml" title="PRIN BLOG">
+  <meta name="keywords" content="前端,React," />
+
+<meta name="description" content="前端老年人复健篇，堂堂连载！ 两年多没碰前端，感觉自己已经完全与时代脱节了。作为一个从 jQuery 一把梭时代过来的选手，对于现在那些「大前端」的玩意儿基本都是只懂个皮毛的状态（指看过 Hello world）。四年前我引用过这么一篇文章，《在 2016 年学 JavaScript 是一种什么样的体验？》，放到现在要是出个 2021 版本，估计会更唬人吧。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="React 入门：实现基本登录注册功能">
+<meta property="og:url" content="https://prinsss.github.io/react-login-sign-up/index.html">
+<meta property="og:site_name" content="PRIN BLOG">
+<meta property="og:description" content="前端老年人复健篇，堂堂连载！ 两年多没碰前端，感觉自己已经完全与时代脱节了。作为一个从 jQuery 一把梭时代过来的选手，对于现在那些「大前端」的玩意儿基本都是只懂个皮毛的状态（指看过 Hello world）。四年前我引用过这么一篇文章，《在 2016 年学 JavaScript 是一种什么样的体验？》，放到现在要是出个 2021 版本，估计会更唬人吧。">
+<meta property="og:locale">
+<meta property="article:published_time" content="2021-02-10T05:27:06.000Z">
+<meta property="article:modified_time" content="2021-02-10T05:27:06.000Z">
+<meta property="article:author" content="prin">
+<meta property="article:tag" content="前端">
+<meta property="article:tag" content="React">
+<meta name="twitter:card" content="summary">
+  <meta name="google-site-verification" content="GRFMvqszPSgldR5B46PfCl67MehNVagYoA9AtJpd8BA" />
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/han-css@3.3.0/dist/han.min.css">
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Fira+Mono|Roboto+Slab:400,600|Noto+Serif+SC:600&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@10.6.0/styles/atom-one-dark.min.css" media="screen and (prefers-color-scheme: dark)">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@10.6.0/styles/atom-one-light.min.css" media="screen and (prefers-color-scheme: light)">
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/node-tikzjax@latest/css/fonts.css" /><style>.tikzjax { display: block; text-align: center; user-select: none; }</style></head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="site-name">
+      <a class="logo" href="/">PRIN BLOG</a>
+      <span class="description">半吊子全栈开发者的日常</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <div class="row">
+      <section class="content col-md-8 col-12">
+        
+  <article>
+    <h1 class="post-title">
+      <a href="/react-login-sign-up/">React 入门：实现基本登录注册功能</a>
+    </h1>
+    <div class="post-meta">
+      <span class="post-meta-item post-meta-date">
+  <time datetime="2021-02-10T13:27:06+08:00">2021-02-10</time>
+</span>
+
+<span class="post-meta-item post-meta-categories">
+  <span class="post-meta-item-indicator">Category:</span>
+  
+    <a class="category-link" href="/categories/tech/">技术</a>
+  
+</span>
+
+<span class="post-meta-item post-meta-tags">
+  
+    <a class="tag--link" href="/tag/React/" rel="tag">React</a> <a class="tag--link" href="/tag/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a>
+  
+</span>
+
+
+<span class="post-meta-item post-meta-views">
+  <span class="pv-counter">loading</span> views
+</span>
+
+
+    </div>
+
+    
+      <script src="https://cdn.jsdelivr.net/npm/dayjs@1.10.4/dayjs.min.js"></script>
+<script>
+  var post_updated = dayjs("2021-02-10T05:27:06.000Z");
+  var days_diff_now = dayjs().diff(post_updated, 'days');
+
+  if (days_diff_now > 365) {
+    document.write(
+      '<div class="post-warning">'+
+        '本文最后修订于 '+days_diff_now+' 天前（'+post_updated.format('YYYY-MM-DD')+'），'+
+        '其中的信息可能已经有所发展或者不再适用于现阶段。'+
+      '</div>'
+    );
+  }
+</script>
+
+    
+
+    
+
+    <div class="post-content"><p>前端老年人复健篇，堂堂连载！</p>
+<p>两年多没碰前端，感觉自己已经完全与时代脱节了。作为一个从 jQuery 一把梭时代过来的选手，对于现在那些「大前端」的玩意儿基本都是只懂个皮毛的状态（指看过 Hello world）。四年前我引用过这么一篇文章，<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/22782487">《在 2016 年学 JavaScript 是一种什么样的体验？》</a>，放到现在要是出个 2021 版本，估计会更唬人吧。</p>
+<span id="more"></span>
+<p>不过嘛，主要的技术其实还是那么几个：</p>
+<ul>
+<li>前端工程化（模块化、组件化、自动化等）</li>
+<li>TypeScript（支持静态类型检查的 JavaScript）</li>
+<li>ES6+（箭头函数、模板字符串、async/await 等新语法）</li>
+<li>三大框架（Angular、React、Vue）</li>
+<li>跨端技术（Electron、React Native、Flutter、小程序）</li>
+</ul>
+<p>对于初学者来说可能是有些复杂，但应该还没到「求不要更新了，老子学不动了」的程度。</p>
+<p>举个例子，最开始，大家都用原生 HTML、CSS、JavaScript 三板斧来开发网页。后来有人觉得原生的那些方法操作 DOM 啥的太麻烦了，于是弄出了 jQuery 和大家喜闻乐见的 <code>$('#id')</code>；觉得代码组织不方便，于是弄出了各种<a href="https://prinsss.github.io/how-could-i-use-es6-modules-in-production/">模块化解决方案</a>；觉得 Callback Hell 太傻X了，于是有了 Promise 和 async/await。觉得 JS 没有类型系统太容易出 BUG，于是有了 TS；觉得手动监听事件、操作 DOM 太麻烦了，于是有了数据绑定和三大框架；因为上面这些乱七八糟的最后都得拿去浏览器跑，所以有了 Babel、Webpack 和各种工具链；还有人觉得前端技术这么牛逼，光写网页怎么够，于是有了各种大前端、跨端开发技术……</p>
+<p>如此种种，其实没有哪个技术是凭空蹦出来的，都是有需求才有人去做。如果你在实际开发中体会到了这个需求，那么这些新技术的出现也就变得理所当然了。而这也是我推荐新人学一门编程语言不要从框架学起的原因：比如从 Vue 开始学前端，从 Laravel 开始学 PHP，从 Spring 开始学 Java，很容易知其然而不知其所以然。</p>
+<p>好了废话就到这里，今天咱们来用 React 实现一个基本的登录注册系统。</p>
+<hr />
+<p>【后面的内容鸽了】</p>
+</div>
+    <div class="post-copyright"><p>除另有声明外，本博客文章均采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by/4.0/">知识共享(Creative Commons) 署名 4.0 国际许可协议</a> 进行许可。转载请注明原作者与文章出处。</p></div>
+  </article>
+
+  
+    <nav class="post-nav">
+      
+      <div class="post-nav-item post-nav-prev">上一篇：
+        <a href="/build-x86-docker-images-on-an-m1-macs/">在 M1 Mac 上构建 x86 Docker 镜像</a>
+      </div>
+      
+      
+      <div class="post-nav-item post-nav-next">下一篇：
+        <a href="/use-github-actions-to-deploy-hexo-blog/">使用 GitHub Actions 自动部署 Hexo 博客</a>
+      </div>
+      
+    </nav>
+  
+
+  
+    
+
+
+<script src="https://giscus.app/client.js"
+  data-repo="prinsss/prinsss.github.io"
+  data-repo-id="MDEwOlJlcG9zaXRvcnkxMDU3MzY5MTA="
+  data-category="Announcements"
+  data-category-id="DIC_kwDOBk1qzs4CawFb"
+  data-mapping="title"
+  data-strict="1"
+  data-reactions-enabled="1"
+  data-emit-metadata="0"
+  data-input-position="top"
+  data-theme="preferred_color_scheme"
+  data-lang="zh-CN"
+  data-loading="lazy"
+  crossorigin="anonymous"
+  async>
+</script>
+
+
+  
+
+      </section>
+      <aside class="sidebar col-md-3 offset-md-1 col-12">
+        
+  
+
+        
+
+
+<section class="widget" id="widget-categories">
+  <h3 class="widget-title">分类</h3>
+  
+  
+    <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/tech/">技术</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/diary/">日常</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/essay/">随笔</a></li></ul>
+  
+</section>
+
+
+
+<section class="widget" id="widget-pages">
+  <h3 class="widget-title">页面</h3>
+  <ul class="menu">
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives/" title="">归档</a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about/" title="">关于我</a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-friends">
+        <a href="/friends/" title="">朋友们</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+<section class="widget" id="widget-links">
+  <h3 class="widget-title">链接</h3>
+  <ul class="menu">
+    
+      
+      <li class="menu-item menu-item-github">
+        <a href="https://github.com/prinsss" title="" target="_blank">GitHub</a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-rss">
+        <a href="/atom.xml" title="" target="_blank">RSS Feed</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+      </aside>
+    </div>
+  </div>
+</main>
+
+<footer>
+  
+  <div class="container">
+    <p>
+      &copy; 2026 <a href="https://prinsss.github.io">PRIN BLOG</a>. Proudly published with
+      <a href="https://hexo.io/" target="_blank">Hexo</a> & <a href="https://github.com/printempw/hexo-theme-murasaki/" target="_blank">Murasaki</a>.
+    </p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/han-css@3.3.0/dist/han.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@10.6.0/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@17.3.1/dist/lazyload.min.js"></script>
+<script>
+  hljs.initHighlightingOnLoad();
+  Han(document.querySelector('section.content')).setRoutine([
+    'initCond', 'renderElem', 'renderJiya', 'correctBasicBD', 'substCombLigaWithPUA'
+    // 'renderHanging', 'renderHWS'
+  ]).render();
+  new LazyLoad({
+    elements_selector: '.post-content img',
+    callback_loaded: function (el) {
+      el.parentNode.nodeName.toLowerCase() === 'a' || mediumZoom(el, { margin: 24 });
+    }
+  });
+</script>
+  <script async src="https://oishii.prin.studio/delicious-party"
+    data-website-id="02075562-9733-4917-8c28-be13173bb1f7">
+  </script>
+
+</body>
+</html>
