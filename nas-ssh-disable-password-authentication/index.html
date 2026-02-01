@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <title>禁止 Synology/QNAP NAS 通过 ssh 密码登录 - PRIN BLOG</title>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="HandheldFriendly" content="True" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+<meta name="generator" content="Hexo" />
+<link rel="icon" href="/images/favicon.png" />
+  <link rel="canonical" href="https://prinsss.github.io/nas-ssh-disable-password-authentication/"/>
+  <link rel="alternate" type="application/atom+xml" href="/atom.xml" title="PRIN BLOG">
+  <meta name="keywords" content="NAS,笔记," />
+
+<meta name="description" content="使用成品 NAS，在相对省心的同时，也意味着更低的自由度。很多自定义操作都是在和这些定制化 OS 斗智斗勇。 本文介绍了在 QNAP 威联通 NAS（以及 Synology 群晖 NAS）上关闭 ssh 密码登录，仅允许密钥登录的方法。Synology 相对还好，对 OpenSSH 的魔改不多，和普通 Linux 一样修改 &#x2F;etc&#x2F;ssh&#x2F;sshd_config 就好了。 但是 QNAP 这个">
+<meta property="og:type" content="article">
+<meta property="og:title" content="禁止 Synology&#x2F;QNAP NAS 通过 ssh 密码登录">
+<meta property="og:url" content="https://prinsss.github.io/nas-ssh-disable-password-authentication/index.html">
+<meta property="og:site_name" content="PRIN BLOG">
+<meta property="og:description" content="使用成品 NAS，在相对省心的同时，也意味着更低的自由度。很多自定义操作都是在和这些定制化 OS 斗智斗勇。 本文介绍了在 QNAP 威联通 NAS（以及 Synology 群晖 NAS）上关闭 ssh 密码登录，仅允许密钥登录的方法。Synology 相对还好，对 OpenSSH 的魔改不多，和普通 Linux 一样修改 &#x2F;etc&#x2F;ssh&#x2F;sshd_config 就好了。 但是 QNAP 这个">
+<meta property="og:locale">
+<meta property="article:published_time" content="2026-02-02T00:00:00.000Z">
+<meta property="article:modified_time" content="2026-02-02T00:00:00.000Z">
+<meta property="article:author" content="prin">
+<meta property="article:tag" content="NAS">
+<meta property="article:tag" content="笔记">
+<meta name="twitter:card" content="summary">
+  <meta name="google-site-verification" content="GRFMvqszPSgldR5B46PfCl67MehNVagYoA9AtJpd8BA" />
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/han-css@3.3.0/dist/han.min.css">
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Fira+Mono|Roboto+Slab:400,600|Noto+Serif+SC:600&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@10.6.0/styles/atom-one-dark.min.css" media="screen and (prefers-color-scheme: dark)">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@10.6.0/styles/atom-one-light.min.css" media="screen and (prefers-color-scheme: light)">
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/node-tikzjax@latest/css/fonts.css" /><style>.tikzjax { display: block; text-align: center; user-select: none; }</style></head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="site-name">
+      <a class="logo" href="/">PRIN BLOG</a>
+      <span class="description">半吊子全栈开发者的日常</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <div class="row">
+      <section class="content col-md-8 col-12">
+        
+  <article>
+    <h1 class="post-title">
+      <a href="/nas-ssh-disable-password-authentication/">禁止 Synology/QNAP NAS 通过 ssh 密码登录</a>
+    </h1>
+    <div class="post-meta">
+      <span class="post-meta-item post-meta-date">
+  <time datetime="2026-02-02T08:00:00+08:00">2026-02-02</time>
+</span>
+
+<span class="post-meta-item post-meta-categories">
+  <span class="post-meta-item-indicator">Category:</span>
+  
+    <a class="category-link" href="/categories/tech/">技术</a>
+  
+</span>
+
+<span class="post-meta-item post-meta-tags">
+  
+    <a class="tag--link" href="/tag/NAS/" rel="tag">NAS</a> <a class="tag--link" href="/tag/%E7%AC%94%E8%AE%B0/" rel="tag">笔记</a>
+  
+</span>
+
+
+<span class="post-meta-item post-meta-views">
+  <span class="pv-counter">loading</span> views
+</span>
+
+
+    </div>
+
+    
+      <script src="https://cdn.jsdelivr.net/npm/dayjs@1.10.4/dayjs.min.js"></script>
+<script>
+  var post_updated = dayjs("2026-02-02T00:00:00.000Z");
+  var days_diff_now = dayjs().diff(post_updated, 'days');
+
+  if (days_diff_now > 365) {
+    document.write(
+      '<div class="post-warning">'+
+        '本文最后修订于 '+days_diff_now+' 天前（'+post_updated.format('YYYY-MM-DD')+'），'+
+        '其中的信息可能已经有所发展或者不再适用于现阶段。'+
+      '</div>'
+    );
+  }
+</script>
+
+    
+
+    
+      <div class="post-toc"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A3%8E%E9%99%A9%E6%8F%90%E7%A4%BA"><span class="toc-text">风险提示</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#synology-nas"><span class="toc-text">Synology NAS</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#qnap-nas"><span class="toc-text">QNAP NAS</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#bonus-macos"><span class="toc-text">Bonus: macOS</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B0%8F%E5%B0%BE%E5%B7%B4"><span class="toc-text">小尾巴</span></a></li></ol></div>
+    
+
+    <div class="post-content"><p>使用成品 NAS，在相对省心的同时，也意味着更低的自由度。很多自定义操作都是在和这些定制化 OS 斗智斗勇。</p>
+<p>本文介绍了在 QNAP 威联通 NAS（以及 Synology 群晖 NAS）上关闭 ssh 密码登录，仅允许密钥登录的方法。Synology 相对还好，对 OpenSSH 的魔改不多，和普通 Linux 一样修改 <code>/etc/ssh/sshd_config</code> 就好了。</p>
+<p>但是 QNAP 这个 B，每次启动 sshd 服务都会重新生成配置，直接修改上述配置文件是没法持久化保存的。</p>
+<span id="more"></span>
+<h2 id="风险提示"><a href="#风险提示" class="headerlink" title="风险提示"></a>风险提示</h2>
+<p>为了避免你被锁在门外，修改自带 sshd 配置之前，最好自己再起一个 ssh 服务，等确认 OK 了之后再关掉。<strong>以及最重要的，做好备份！</strong></p>
+<pre class="bash"><code>sudo opkg install dropbear
+sudo dropbear -F -p 9922 -P /opt/var/run/dropbear.pid -R -w -E</code></pre>
+<p>如果你不幸已经进不去系统了，可以这样自救（别问我为什么知道🤣）：</p>
+<ul>
+<li>从 Web UI 打开 Container Station / Container Manager</li>
+<li>通过上传 docker-compose.yml 的方式创建容器（通常方式创建的话是不让挂载特殊路径的）</li>
+<li>挂载要修改的路径，比如 <code>/etc/init.d/</code></li>
+<li>启动容器后，选择 打开终端机/连接终端，然后把改坏的文件改回来</li>
+</ul>
+<pre class="yaml"><code>services:
+  rescue-tmp:
+    image: ubuntu:latest
+    container_name: rescue-tmp
+    stdin_open: true
+    tty: true
+    command: /bin/bash
+    volumes:
+      - /etc/init.d:/work</code></pre>
+<h2 id="synology-nas"><a href="#synology-nas" class="headerlink" title="Synology NAS"></a>Synology NAS</h2>
+<blockquote>
+<p>⚠ <strong>改文件之前做好备份！</strong></p>
+</blockquote>
+<p>执行 <code>sudo vim /etc/ssh/sshd_config</code>，修改：</p>
+<pre class="diff"><code> PubkeyAuthentication yes
+ ChallengeResponseAuthentication no
+
+-PasswordAuthentication yes
++PasswordAuthentication no</code></pre>
+<p>然后 <code>sudo synosystemctl restart sshd.service</code> 重启 sshd 生效，或者在 DSM Web UI 上关闭「启动 SSH 功能」后再打开也可以。</p>
+<p>值得一提的是，直接修改 <code>sshd_config</code> 中的 <code>Port</code>，会导致 sshd 监听在两个端口上，一个是 Web UI 上设置的「SSH 端口」，一个是配置文件中配置的端口，而且后者是无法用于登录 Shell 的，会提示 <code>Permission denied, please try again.</code>。</p>
+<p>研究了一下，应该是因为 sshd 被魔改过，会读取 <code>/etc/synoinfo.conf</code> 文件里的 <code>ssh_port</code> 配置。</p>
+<pre class="bash"><code>sudo lsof -c sshd
+# COMMAND   PID USER  FD   TYPE  SIZE/OFF    NODE NAME
+# sshd    28232 root cwd    DIR      4096       2 /
+# sshd    28232 root rtd    DIR      4096       2 /
+# sshd    28232 root txt    REG    888480   20645 /usr/bin/sshd
+# sshd    28232 root   3u  IPv4       0t0     TCP *:2222 (LISTEN)
+# sshd    28232 root   4u  IPv6       0t0     TCP *:2222 (LISTEN)
+# sshd    28232 root   5u  IPv4       0t0     TCP *:6622 (LISTEN)
+# sshd    28232 root   6u  IPv6       0t0     TCP *:6622 (LISTEN)
+
+cat /etc/synoinfo.conf | grep -i port
+# ssh_port=&quot;2222&quot;
+# sftpPort=&quot;3322&quot;
+# rsync_sshd_port=&quot;4422&quot;
+
+strings /usr/bin/sshd
+# SYNOServiceSSHPortGet
+# /etc/ssh/sshd_config
+# /etc/synoinfo.conf
+# Permission denied, please try again.</code></pre>
+<p>而根据 <a target="_blank" rel="noopener" href="https://wrgms.com/reverse-engineering-synology-openssh/">Reverse Engineering Synology’s OpenSSH</a> 这篇博客里的说法，这个魔改过的 OpenSSH 会校验一些参数，所以无法连接。</p>
+<p>不过对于我们的目标「禁用 ssh 密码登录」没什么影响，就这样吧。这些厂商定制化的东西还是少碰，别给整挂了。</p>
+<h2 id="qnap-nas"><a href="#qnap-nas" class="headerlink" title="QNAP NAS"></a>QNAP NAS</h2>
+<p>大的来了（掩鼻）。</p>
+<p>先看看 QNAP 的 sshd 用的什么配置文件：</p>
+<pre class="bash"><code>ps aux | grep sshd
+# 22714 admin     11504 S   /usr/sbin/sshd -f /etc/config/ssh/sshd_config -p 2222
+
+cat /etc/config/ssh/sshd_config
+# Protocol 2
+# HostKey /etc/ssh/ssh_host_ed25519_key
+# PermitRootLogin yes
+# UseDNS no
+# Subsystem sftp /usr/libexec/sftp-server
+# AllowTcpForwarding yes
+# AllowUsers admin prin
+
+echo &#39;PasswordAuthentication no&#39; | sudo tee -a /etc/config/ssh/sshd_config</code></pre>
+<p>重启 sshd 后，你会惊喜地发现，刚才改掉的配置文件，诶，又被改回来了😁：</p>
+<pre class="bash"><code>sudo setsid /etc/init.d/login.sh restart
+
+grep PasswordAuthentication /etc/config/ssh/sshd_config</code></pre>
+<p>既然配置文件没法持久化，那就只能从启动脚本下手了。</p>
+<p>简单看看 <code>/etc/init.d/login.sh</code>（文件缩进就是这样，我保留了原汁原味）：</p>
+<pre class="bash"><code>SSH=/usr/sbin/sshd
+SSHD_CONF=/etc/config/ssh/sshd_config
+SSHD_CONF_DEFAULT=/etc/ssh/sshd_config
+SSH_PORT=`/sbin/getcfg LOGIN &quot;SSH Port&quot; -d 22`
+
+update_sshd_config()
+&#123;
+ /sbin/mksshdconf
+ ENABLED_SFTP=`/sbin/getcfg LOGIN &quot;SFTP Enable&quot; -u -d TRUE`
+ # ...
+ #Set PermitRootLogin yes
+ OPTION=&quot;PermitRootLogin&quot;
+ if [ -z &quot;`grep .*$&#123;OPTION&#125;.* $&#123;SSHD_CONF&#125;`&quot; ]; then
+     echo &quot;$&#123;OPTION&#125; yes&quot; &gt; $&#123;SSHD_CONF&#125;
+ else
+        sed -i &quot;s/^#\s\?$&#123;OPTION&#125;\s\?[yesno]\&#123;1,3\&#125;.*/$&#123;OPTION&#125; yes/g&quot; $&#123;SSHD_CONF&#125;
+ fi
+ # ...
+&#125;
+
+# ...
+case &quot;$1&quot; in
+    start)
+ # for openssh 7.5p1 and later
+ sed -i &#39;/^UsePrivilegeSeparation .*/d&#39; $&#123;SSHD_CONF_DEFAULT&#125;
+
+ /bin/chmod 0400 /etc/config/shadow* /etc/default_config/shadow
+ update_ssh_client_config
+ if [ `/sbin/getcfg LOGIN &quot;SSH Enable&quot; -u -d FALSE` != FALSE ]; then
+  echo -n &quot;Starting sshd service: &quot;
+  generte_ssh_key
+     if [ ! -f &quot;$&#123;SSHD_CONF&#125;&quot; ]; then
+      /bin/cp -f $&#123;SSHD_CONF_DEFAULT&#125; $&#123;SSHD_CONF&#125;
+     fi
+     if [ ! -f &quot;$&#123;SSHD_CONF&#125;&quot; ]; then
+      SSHD_CONF=$&#123;SSHD_CONF_DEFAULT&#125;
+     fi
+  update_sshd_config
+        sshd_privilege_separation
+  /sbin/daemon_mgr sshd start &quot;$SSH -f $&#123;SSHD_CONF&#125; -p $SSH_PORT&quot;
+  echo &quot;OK&quot;
+  touch /var/lock/subsys/sshd
+ fi
+ ;;
+ # ...
+esac</code></pre>
+<p>你可能以为有这个 <code>cp -f $&#123;SSHD_CONF_DEFAULT&#125; $&#123;SSHD_CONF&#125;</code>，我们就能通过修改 <code>/etc/ssh/sshd_config</code> 来实现配置持久化了 —— 天真！</p>
+<p>实测下来发现 <code>/sbin/mksshdconf</code> 这个二进制每次执行都会重置 <code>/etc/config/ssh/sshd_config</code> 的内容，所以你 cp 了也没有用。我也不知道他们为什么要写一个没有意义的 cp 在那里。🤷</p>
+<p>我搜了下，<a target="_blank" rel="noopener" href="https://i.am.eddmil.es/posts/ssh-certificates/">这篇博客</a> 里也有类似的吐槽：</p>
+<blockquote>
+<p>For reasons I can’t fathom, the SSH config on a QNAP seems nuts (If anyone knows why it works this way, please let me know, because I must be missing something obvious).</p>
+</blockquote>
+<p>就算抛开这些不谈，你这个强制 <code>PermitRootLogin yes</code> 是何意啊？</p>
+<p>所以我们还是只能改脚本，重启 sshd 后生效：</p>
+<blockquote>
+<p>⚠ <strong>改文件之前做好备份！</strong></p>
+</blockquote>
+<pre class="diff"><code>--- /etc/init.d/login.sh.bak
++++ /etc/init.d/login.sh
+@@ -83,6 +83,9 @@
+ update_sshd_config()
+ &#123;
+  /sbin/mksshdconf
++ echo &#39;PasswordAuthentication no&#39; &gt;&gt; $&#123;SSHD_CONF&#125;
++ echo &#39;ChallengeResponseAuthentication no&#39; &gt;&gt; $&#123;SSHD_CONF&#125;
++ sed -i &quot;s/PermitRootLogin yes/PermitRootLogin no/g&quot; $&#123;SSHD_CONF&#125;
+  ENABLED_SFTP=`/sbin/getcfg LOGIN &quot;SFTP Enable&quot; -u -d TRUE`
+
+  if [ &quot;x$&#123;ENABLED_SFTP&#125;&quot; = &quot;xTRUE&quot; ]; then</code></pre>
+<p>注意：系统更新后这个脚本会被重置，需要重新修改。</p>
+<h2 id="bonus-macos"><a href="#bonus-macos" class="headerlink" title="Bonus: macOS"></a>Bonus: macOS</h2>
+<p>其实和大部分 Linux 一样啦，写在这里只是为了顺便记一下：</p>
+<pre class="bash"><code>cat &lt;&lt; EOF | sudo tee /etc/ssh/sshd_config.d/10-no-passwords.conf
+PubkeyAuthentication yes
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+EOF</code></pre>
+<p><code>sshd_config.d</code> 里的序号规则是 <a target="_blank" rel="noopener" href="https://utcc.utoronto.ca/~cks/space/blog/sysadmin/OpenSSHConfigOrderMatters">小的覆盖大的</a>。</p>
+<p>重启 sshd：</p>
+<pre class="bash"><code># Linux systemd
+systemctl restart ssh.service
+systemctl status ssh.service
+
+# macOS launchd
+launchctl kickstart -k -p system/com.openssh.sshd
+launchctl print system/com.openssh.sshd</code></pre>
+<p>让 VNC 远程桌面只能通过 ssh 隧道连接（<a target="_blank" rel="noopener" href="https://gist.github.com/jabenninghoff/a0341af66b3e156ab07fd2c5fdba614c">仅监听 127.0.0.1</a>）：</p>
+<pre class="bash"><code>sudo defaults write /Library/Preferences/com.apple.RemoteManagement.plist VNCOnlyLocalConnections -bool yes
+
+ssh -L 5900:127.0.0.1:5900 mac-mini</code></pre>
+<h2 id="小尾巴"><a href="#小尾巴" class="headerlink" title="小尾巴"></a>小尾巴</h2>
+<p>保不齐这些 NAS 系统后续更新会出什么幺蛾子，可以让 AI 搓一个脚本，放在 Docker 容器里 crontab 定时运行，然后给一个服务器列表，一旦发现任何服务器允许 PasswordAuthentication，就发送通知告警。</p>
+<p>修改后的效果：</p>
+<pre class="bash"><code>ssh -o PreferredAuthentications=password,keyboard-interactive prin@192.168.1.10 -p 2222
+# prin@192.168.1.10: Permission denied (publickey).
+
+ssh -o PreferredAuthentications=password,keyboard-interactive prin@192.168.2.10 -p 2222
+# prin@192.168.2.10: Permission denied (publickey).</code></pre>
+</div>
+    <div class="post-copyright"><p>除另有声明外，本博客文章均采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by/4.0/">知识共享(Creative Commons) 署名 4.0 国际许可协议</a> 进行许可。转载请注明原作者与文章出处。</p></div>
+  </article>
+
+  
+    <nav class="post-nav">
+      
+      <div class="post-nav-item post-nav-prev">上一篇：
+        <a href="/macos-launchd-launchctl-notes/">类比 systemd 的 macOS launchd 使用笔记</a>
+      </div>
+      
+      
+      <div class="post-nav-item post-nav-next">下一篇：
+        <a href="/synology-disk-compatibility-fix/">修复 Synology NAS 升级后 M.2 存储池兼容性问题</a>
+      </div>
+      
+    </nav>
+  
+
+  
+    
+
+
+<script src="https://giscus.app/client.js"
+  data-repo="prinsss/prinsss.github.io"
+  data-repo-id="MDEwOlJlcG9zaXRvcnkxMDU3MzY5MTA="
+  data-category="Announcements"
+  data-category-id="DIC_kwDOBk1qzs4CawFb"
+  data-mapping="title"
+  data-strict="1"
+  data-reactions-enabled="1"
+  data-emit-metadata="0"
+  data-input-position="top"
+  data-theme="preferred_color_scheme"
+  data-lang="zh-CN"
+  data-loading="lazy"
+  crossorigin="anonymous"
+  async>
+</script>
+
+
+  
+
+      </section>
+      <aside class="sidebar col-md-3 offset-md-1 col-12">
+        
+  
+  <section class="widget widget-toc">
+    <h3 class="widget-title">文章目录</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A3%8E%E9%99%A9%E6%8F%90%E7%A4%BA"><span class="toc-text">风险提示</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#synology-nas"><span class="toc-text">Synology NAS</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#qnap-nas"><span class="toc-text">QNAP NAS</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#bonus-macos"><span class="toc-text">Bonus: macOS</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B0%8F%E5%B0%BE%E5%B7%B4"><span class="toc-text">小尾巴</span></a></li></ol>
+  </section>
+  
+
+        
+
+
+<section class="widget" id="widget-categories">
+  <h3 class="widget-title">分类</h3>
+  
+  
+    <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/tech/">技术</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/diary/">日常</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/essay/">随笔</a></li></ul>
+  
+</section>
+
+
+
+<section class="widget" id="widget-pages">
+  <h3 class="widget-title">页面</h3>
+  <ul class="menu">
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives/" title="">归档</a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about/" title="">关于我</a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-friends">
+        <a href="/friends/" title="">朋友们</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+<section class="widget" id="widget-links">
+  <h3 class="widget-title">链接</h3>
+  <ul class="menu">
+    
+      
+      <li class="menu-item menu-item-github">
+        <a href="https://github.com/prinsss" title="" target="_blank">GitHub</a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-rss">
+        <a href="/atom.xml" title="" target="_blank">RSS Feed</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+      </aside>
+    </div>
+  </div>
+</main>
+
+<footer>
+  
+  <div class="container">
+    <p>
+      &copy; 2026 <a href="https://prinsss.github.io">PRIN BLOG</a>. Proudly published with
+      <a href="https://hexo.io/" target="_blank">Hexo</a> & <a href="https://github.com/printempw/hexo-theme-murasaki/" target="_blank">Murasaki</a>.
+    </p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/han-css@3.3.0/dist/han.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@10.6.0/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@17.3.1/dist/lazyload.min.js"></script>
+<script>
+  hljs.initHighlightingOnLoad();
+  Han(document.querySelector('section.content')).setRoutine([
+    'initCond', 'renderElem', 'renderJiya', 'correctBasicBD', 'substCombLigaWithPUA'
+    // 'renderHanging', 'renderHWS'
+  ]).render();
+  new LazyLoad({
+    elements_selector: '.post-content img',
+    callback_loaded: function (el) {
+      el.parentNode.nodeName.toLowerCase() === 'a' || mediumZoom(el, { margin: 24 });
+    }
+  });
+</script>
+  <script async src="https://oishii.prin.studio/delicious-party"
+    data-website-id="02075562-9733-4917-8c28-be13173bb1f7">
+  </script>
+
+</body>
+</html>

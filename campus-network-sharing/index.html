@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <title>绕过校园网分享限制，构建愉快的宿舍网络环境 - PRIN BLOG</title>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="HandheldFriendly" content="True" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+<meta name="generator" content="Hexo" />
+<link rel="icon" href="/images/favicon.png" />
+  <link rel="canonical" href="https://prinsss.github.io/campus-network-sharing/"/>
+  <link rel="alternate" type="application/atom+xml" href="/atom.xml" title="PRIN BLOG">
+  <meta name="keywords" content="网络," />
+
+<meta name="description" content="最近大一新生们开学了，就有几位学弟来问我说，咱们学校的校园网要怎么才能开 WiFi 热点、能不能用路由器。回想一下当初我也折腾了好一段时间，本来想水篇博客的，后来不知道怎么的就咕咕咕了……正好借此机会分享一下。 其实吧，学校有的是办法搞你。除了强制一人一号、恶心的专用拨号客户端防共享以外，还能通过 IPID、TTL、时钟偏移检测，甚至是 DPI 深度包检测的方法来防私接，就看校方做得够不够绝了。当">
+<meta property="og:type" content="article">
+<meta property="og:title" content="绕过校园网分享限制，构建愉快的宿舍网络环境">
+<meta property="og:url" content="https://prinsss.github.io/campus-network-sharing/index.html">
+<meta property="og:site_name" content="PRIN BLOG">
+<meta property="og:description" content="最近大一新生们开学了，就有几位学弟来问我说，咱们学校的校园网要怎么才能开 WiFi 热点、能不能用路由器。回想一下当初我也折腾了好一段时间，本来想水篇博客的，后来不知道怎么的就咕咕咕了……正好借此机会分享一下。 其实吧，学校有的是办法搞你。除了强制一人一号、恶心的专用拨号客户端防共享以外，还能通过 IPID、TTL、时钟偏移检测，甚至是 DPI 深度包检测的方法来防私接，就看校方做得够不够绝了。当">
+<meta property="og:locale">
+<meta property="og:image" content="https://prinsss.github.io/campus-network-sharing/taobao-campus-routers.jpg">
+<meta property="og:image" content="https://prinsss.github.io/campus-network-sharing/vm-windows-xp-miwifi.png">
+<meta property="og:image" content="https://prinsss.github.io/campus-network-sharing/network-topology.png">
+<meta property="og:image" content="https://prinsss.github.io/campus-network-sharing/router-interfaces.jpg">
+<meta property="og:image" content="https://prinsss.github.io/campus-network-sharing/virtualbox-alpine-booting.png">
+<meta property="og:image" content="https://prinsss.github.io/campus-network-sharing/smiling-dog.png">
+<meta property="article:published_time" content="2020-10-18T08:45:00.000Z">
+<meta property="article:modified_time" content="2020-10-18T08:45:00.000Z">
+<meta property="article:author" content="prin">
+<meta property="article:tag" content="网络">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://prinsss.github.io/campus-network-sharing/taobao-campus-routers.jpg">
+  <meta name="google-site-verification" content="GRFMvqszPSgldR5B46PfCl67MehNVagYoA9AtJpd8BA" />
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/han-css@3.3.0/dist/han.min.css">
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Fira+Mono|Roboto+Slab:400,600|Noto+Serif+SC:600&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@10.6.0/styles/atom-one-dark.min.css" media="screen and (prefers-color-scheme: dark)">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@10.6.0/styles/atom-one-light.min.css" media="screen and (prefers-color-scheme: light)">
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/node-tikzjax@latest/css/fonts.css" /><style>.tikzjax { display: block; text-align: center; user-select: none; }</style></head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="site-name">
+      <a class="logo" href="/">PRIN BLOG</a>
+      <span class="description">半吊子全栈开发者的日常</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <div class="row">
+      <section class="content col-md-8 col-12">
+        
+  <article>
+    <h1 class="post-title">
+      <a href="/campus-network-sharing/">绕过校园网分享限制，构建愉快的宿舍网络环境</a>
+    </h1>
+    <div class="post-meta">
+      <span class="post-meta-item post-meta-date">
+  <time datetime="2020-10-18T16:45:00+08:00">2020-10-18</time>
+</span>
+
+<span class="post-meta-item post-meta-categories">
+  <span class="post-meta-item-indicator">Category:</span>
+  
+    <a class="category-link" href="/categories/tech/">技术</a>
+  
+</span>
+
+<span class="post-meta-item post-meta-tags">
+  
+    <a class="tag--link" href="/tag/%E7%BD%91%E7%BB%9C/" rel="tag">网络</a>
+  
+</span>
+
+
+<span class="post-meta-item post-meta-views">
+  <span class="pv-counter">loading</span> views
+</span>
+
+
+    </div>
+
+    
+      <script src="https://cdn.jsdelivr.net/npm/dayjs@1.10.4/dayjs.min.js"></script>
+<script>
+  var post_updated = dayjs("2020-10-18T08:45:00.000Z");
+  var days_diff_now = dayjs().diff(post_updated, 'days');
+
+  if (days_diff_now > 365) {
+    document.write(
+      '<div class="post-warning">'+
+        '本文最后修订于 '+days_diff_now+' 天前（'+post_updated.format('YYYY-MM-DD')+'），'+
+        '其中的信息可能已经有所发展或者不再适用于现阶段。'+
+      '</div>'
+    );
+  }
+</script>
+
+    
+
+    
+      <div class="post-toc"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%A1%E5%9B%AD%E7%BD%91%E7%9A%84%E9%99%90%E5%88%B6"><span class="toc-text">校园网的限制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%BB%95%E8%BF%87%E7%BD%91%E5%8D%A1%E6%A3%80%E6%B5%8B"><span class="toc-text">使用虚拟机绕过网卡检测</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E6%9C%89%E7%BA%BF%E7%BD%91%E5%8D%A1%E6%A1%A5%E6%8E%A5%E8%B7%AF%E7%94%B1%E5%99%A8"><span class="toc-text">使用有线网卡桥接路由器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BD%93%E5%89%8D%E6%96%B9%E6%A1%88%E7%9A%84%E4%B8%8D%E8%B6%B3%E4%B9%8B%E5%A4%84"><span class="toc-text">当前方案的不足之处</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%A5%E6%89%8B%E5%8F%8C%E7%BD%91%E5%8F%A3%E5%B7%A5%E6%8E%A7%E6%9C%BA%E8%BD%AF%E8%B7%AF%E7%94%B1"><span class="toc-text">入手双网口工控机软路由</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%99%E5%9C%A8%E5%90%8E%E9%9D%A2"><span class="toc-text">写在后面</span></a></li></ol></div>
+    
+
+    <div class="post-content"><p>最近大一新生们开学了，就有几位学弟来问我说，咱们学校的校园网要怎么才能开 WiFi 热点、能不能用路由器。回想一下当初我也折腾了好一段时间，本来想水篇博客的，后来不知道怎么的就咕咕咕了……正好借此机会分享一下。</p>
+<p>其实吧，学校有的是办法搞你。除了强制一人一号、恶心的专用拨号客户端防共享以外，还能通过 <a target="_blank" rel="noopener" href="https://www.xavier.wang/post/45-suck-shit-lan/">IPID、TTL、时钟偏移检测</a>，甚至是 DPI 深度包检测的方法来防私接，就看校方做得够不够绝了。当然破解的方法也有，但基本也不会让你好受。如果碰到这样的校园网，推荐你直接躺平，给这种垃圾网络交钱还不如开个无限流量套餐呢。</p>
+<p><strong>免责声明：日后你惹出祸来，不把师父说出来就行了.jpg</strong></p>
+<span id="more"></span>
+<h2 id="校园网的限制"><a href="#校园网的限制" class="headerlink" title="校园网的限制"></a>校园网的限制</h2>
+<p>先说一下我们学校校园网恶心的地方。接入网线后，你需要：</p>
+<ol type="1">
+<li>使用【软件A】进行第一次拨号：
+<ul>
+<li>【软件A】会进行多网卡检测，如果你的系统里有一个以上的网络适配器，则拒绝拨号；</li>
+<li>上述网络适配器包括硬件网卡（USB 网卡、无线网卡）和虚拟网卡（各种虚拟机的虚拟网卡、TAP 网卡等）；</li>
+<li>认证类型为 802.1x 认证。</li>
+</ul></li>
+<li>使用【软件B】进行第二次拨号：
+<ul>
+<li>【软件B】不检测网卡，但会拒绝在虚拟机中运行，如果宿主机开了 Hyper-V 还会误报；</li>
+<li>检测猎豹 WiFi、360 WiFi 等共享软件的进程；</li>
+<li>认证类型为 L2TP VPN。</li>
+</ul></li>
+</ol>
+<p>而且这两个软件只能在 Windows 上跑，macOS、Linux 用户就干瞪眼吧。</p>
+<p><del>其实说到这里，有些人应该都心里有数这俩软件是啥。不过我这里就不明说了，懂的都懂（x</del></p>
+<p>接下来来看一下网上常见的破解方案，也就是<strong>路由器拨号</strong>。</p>
+<p>据说网上有很多人在卖所谓的「校园网路由器」，其实说白了就是刷了 OpenWRT 的路由器 + 破解校园网的插件。如果有现成的插件能用，那自然是最好，刷个固件也不是什么难事。但不幸的是，目前网上并没有针对【软件A】新版本的拨号脚本，而旧版本的已经不再适用于我们学校的网络了。除非另有大神愿意开发新版本的拨号脚本，否则这条路是行不通的。更何况我们这还要二次拨号，更是难上加难。</p>
+<p><img src="/campus-network-sharing/taobao-campus-routers.jpg" srcset="/images/loading.jpg" data-srcset="/campus-network-sharing/taobao-campus-routers.jpg" alt="taobao-campus-routers" /></p>
+<p>而如果想要在电脑上直接分享热点，第一会被检测多网卡，第二可能会被检测进程。</p>
+<p>emmmmm……🤔</p>
+<p>那么，让我们的网卡不被检测到不就行了？</p>
+<h2 id="使用虚拟机绕过网卡检测"><a href="#使用虚拟机绕过网卡检测" class="headerlink" title="使用虚拟机绕过网卡检测"></a>使用虚拟机绕过网卡检测</h2>
+<p>这个方法其实是以前我偶然发现的。</p>
+<p>当时我在用虚拟机捣鼓 Kali Linux，用了 VirtualBox 的 USB Passthrough 功能把 USB 外接网卡穿透进虚拟机给 Kali 使用。此时，宿主机操作系统里是看不见这个 USB 网卡的，设备管理器、网络适配器里都没有，就像不存在一样。不存在……嗯？</p>
+<p>于是我翻箱倒柜找出了几年前凑单买的小米随身 WiFi，在虚拟机里一通操作：</p>
+<p><img src="/campus-network-sharing/vm-windows-xp-miwifi.png" srcset="/images/loading.jpg" data-srcset="/campus-network-sharing/vm-windows-xp-miwifi.png" alt="vm-windows-xp-miwifi" /></p>
+<p>嘿，成了！</p>
+<blockquote>
+<p>如何配置，搜索「VirtualBox USB 网卡」即可。</p>
+</blockquote>
+<p>看来虚拟机的 USB 直通确实可以避开校园网认证客户端的多网卡检测，而且客户端也并没有对 VirtualBox 做什么手脚（后来查了一下，据说【软件A】会干扰 VMware 的 NAT 网络共享服务……）。那么，能做的事情可就多了。</p>
+<h2 id="使用有线网卡桥接路由器"><a href="#使用有线网卡桥接路由器" class="headerlink" title="使用有线网卡桥接路由器"></a>使用有线网卡桥接路由器</h2>
+<p>上面的方案能用是能用，但效率过于低下。</p>
+<ol type="1">
+<li>虚拟机系统没必要用 Windows，就算是 XP 也是性能浪费；</li>
+<li>USB 无线网卡孱弱的 WiFi 性能不足以满足我的需求；</li>
+<li>每次开机都要启动虚拟机，操作繁琐复杂。</li>
+</ol>
+<p>既然要用得爽，那肯定得把这些问题解决了。</p>
+<p>首先，把 USB 无线网卡换成 USB 有线网卡，下联硬路由作为 AP。同时，把 Guest OS 换成轻量级的 Alpine Linux 并实现开机启动。完成后的网络拓扑图类似这样（综合考虑最后还是选择了两层 NAT）：</p>
+<p><img src="/campus-network-sharing/network-topology.png" srcset="/images/loading.jpg" data-srcset="/campus-network-sharing/network-topology.png" alt="network-topology" /></p>
+<p>首先在虚拟机内安装 <a target="_blank" rel="noopener" href="https://alpinelinux.org/">Alpine Linux</a> 和对应的网卡驱动（注意不要用 virt 版本的内核，很多驱动都被精简掉了）：</p>
+<pre class="bash"><code>ip link show</code></pre>
+<pre class="text"><code>1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: eth0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast master br0 state UP qlen 1000
+    link/ether [mac addr] brd ff:ff:ff:ff:ff:ff
+3: eth1: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast master br0 state UP qlen 1000
+    link/ether [mac addr] brd ff:ff:ff:ff:ff:ff
+4: br0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc noqueue state UP qlen 1000
+    link/ether [mac addr] brd ff:ff:ff:ff:ff:ff</code></pre>
+<p>添加网桥，把 USB 网卡和虚拟机的虚拟网卡桥接到一起：</p>
+<pre class="bash"><code>brctl addbr br0
+brctl addif br0 eth0
+brctl addif br0 eth1
+brctl show</code></pre>
+<p>启动网络：</p>
+<pre class="bash"><code>ip link set dev eth1 up
+ip link set dev br0 up
+ip link show</code></pre>
+<p>删除之前分配给虚拟网卡 eth0 的 IP，并启动 DHCP 客户端为 br0 获取 IP 地址：</p>
+<pre class="bash"><code>ip addr flush dev eth0
+udhcpc -i br0
+ip addr show</code></pre>
+<p>此时应该虚拟机内、有线网卡端都能访问网络了，可以通过 <code>ping</code> 测试一下。</p>
+<p>可以用的话就永久保存网络配置：</p>
+<pre class="bash"><code>vi /etc/network/interfaces</code></pre>
+<pre class="text"><code>auto lo
+iface lo inet loopback
+
+auto br0
+iface br0 inet dhcp
+        hostname alpine-vm
+        bridge-ports eth0 eth1
+        bridge-stp 0</code></pre>
+<p>接下来把 USB 网卡和路由器的 WAN 口用网线连接起来，测试是否工作正常。如果想省一层 NAT，可以连到 LAN 口上并关闭路由器 DHCP 功能，就当个单纯的 AP 使用。不过我为了相对稳定的内网环境，还是选择了前者。</p>
+<p><img src="/campus-network-sharing/router-interfaces.jpg" srcset="/images/loading.jpg" data-srcset="/campus-network-sharing/router-interfaces.jpg" alt="router-interfaces" /></p>
+<p>一切正常的话，就可以愉快地使用 WiFi 啦。</p>
+<p>如果想要让 Alpine 虚拟机开机后台运行，可以使用 <a target="_blank" rel="noopener" href="https://github.com/toptensoftware/VBoxHeadlessTray">VBoxHeadlessTray</a> 这个程序。</p>
+<p><img src="/campus-network-sharing/virtualbox-alpine-booting.png" srcset="/images/loading.jpg" data-srcset="/campus-network-sharing/virtualbox-alpine-booting.png" alt="virtualbox-alpine-booting" /></p>
+<h2 id="当前方案的不足之处"><a href="#当前方案的不足之处" class="headerlink" title="当前方案的不足之处"></a>当前方案的不足之处</h2>
+<p>至此，我们的校园网网络共享方案已经算是比较完善了。</p>
+<p>幸运的是，我校似乎并没有部署其他什么防私接技术，像这样用了半年多也一直相安无事，省下我不少流量费。</p>
+<p>然而，这个方案还是有些不爽的地方。</p>
+<ol type="1">
+<li>作为主机的电脑和其他设备不在一个子网下；</li>
+<li>电脑必须一直开着其他设备才能有网。</li>
+</ol>
+<p>在这套方案下，<strong>路由器下联的设备对于主机是几乎不可见的</strong>（不然也绕不过校园网分享限制了）。你可以在其他设备上访问主机上的网络服务（VirtualBox 的 NAT 网络里宿主机的 IP 一般为 <code>10.0.2.2</code>，子网下的设备可以直接访问，效果和主机上访问 <code>localhost</code> 基本一致），但无法反过来访问子网里的其他设备。</p>
+<p>虽然你也可以通过 VirtualBox 的端口映射实现一些变通的解决，比如把路由器的 22、80 端口映射到宿主机上方便访问，但 SMB 这类服务就不行了（Windows 访问 SMB 服务器时强制端口为 445，无法手动指定，要改只能改注册表），所以我完全无法在主机上访问子网下的 NAS 设备。</p>
+<p>这也太难受了，继续改进！</p>
+<p>既然这些软件都需要跑在一台 Windows 机器上，那我专门弄一台机器来跑校园网相关的东西不就好了吗？</p>
+<h2 id="入手双网口工控机软路由"><a href="#入手双网口工控机软路由" class="headerlink" title="入手双网口工控机软路由"></a>入手双网口工控机软路由</h2>
+<p>于是我把目光投向了最近几年很火的软路由。</p>
+<blockquote>
+<p>就像计算机有软件和硬件的区别，路由器也有「软」「硬」之分。通常我们在各个电商平台上搜索「路由器」这三个关键词所得到的几乎所有商品都属于硬路由，它是由路由器厂商基于自行开发或是开源的嵌入式设备操作系统，根据特定的硬件设备，设计出来的传统硬件设备。</p>
+<p>而与之对应的软路由，是基于软件工具在普通的硬件上来实现传统路由器的功能。<strong>我们可以在旧电脑、工控机、开发板、服务器甚至是硬件虚拟机中安装软路由系统，然后通过强大的软件实现各种各样的功能。</strong></p>
+<p>——<a target="_blank" rel="noopener" href="https://sspai.com/post/58628">《从听说到上手，人人都能看懂的软路由入门指南》</a></p>
+</blockquote>
+<p>一番比较后，我在某鱼上入手了一台二手的双网口工控机，安装 Windows 7 系统后，将上面的所有校园网相关的软件都转移到了这台低功耗小主机上。</p>
+<p>至于为什么买双网口的机器，虽然 VirtualBox 只能直通 USB 网卡所以还是得外接，不过考虑到以后不用校园网了还可以原地变身软路由，所以不如直接一步到位买个好点的。毕竟现在 CPU 差不多的也就几百块，没必要省那点钱买个电子垃圾。</p>
+<h2 id="写在后面"><a href="#写在后面" class="headerlink" title="写在后面"></a>写在后面</h2>
+<p>这套方案我用了一年多，基本上没啥问题。24 小时开机、低功耗、子网设备无感知，爽到。</p>
+<p>另外，不要怪我写得这么笼统，毕竟每个学校的校园网都不太一样，很难写出一篇普适性的教程。这篇文章充其量算个 PoC，证明一下只要能折腾，还是能捣鼓出舒适的宿舍网络环境的。</p>
+<p>如果你是大佬，甚至可以写个软件实现一样的功能，隐藏网卡、软件 NAT 啥的。不过我是菜鸡，也不想在这上面花太多心思，所以就这样吧。又不是不能用.jpg</p>
+<p>至于这么折腾值不值得，那就见仁见智了。至少我是愿意的：<strong>你不让我开热点我就不开，那我岂不是很没有面子。</strong>老子又不是没交钱，凭什么？</p>
+<p><img src="/campus-network-sharing/smiling-dog.png" srcset="/images/loading.jpg" data-srcset="/campus-network-sharing/smiling-dog.png" alt="smiling-dog" /></p>
+<p>最后，祝各位早日摆脱傻逼校园网。</p>
+</div>
+    <div class="post-copyright"><p>除另有声明外，本博客文章均采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by/4.0/">知识共享(Creative Commons) 署名 4.0 国际许可协议</a> 进行许可。转载请注明原作者与文章出处。</p></div>
+  </article>
+
+  
+    <nav class="post-nav">
+      
+      <div class="post-nav-item post-nav-prev">上一篇：
+        <a href="/use-github-actions-to-deploy-hexo-blog/">使用 GitHub Actions 自动部署 Hexo 博客</a>
+      </div>
+      
+      
+      <div class="post-nav-item post-nav-next">下一篇：
+        <a href="/airpods-2-are-great/">AirPods 2 到手半个月，我的实际体验如何？</a>
+      </div>
+      
+    </nav>
+  
+
+  
+    
+
+
+<script src="https://giscus.app/client.js"
+  data-repo="prinsss/prinsss.github.io"
+  data-repo-id="MDEwOlJlcG9zaXRvcnkxMDU3MzY5MTA="
+  data-category="Announcements"
+  data-category-id="DIC_kwDOBk1qzs4CawFb"
+  data-mapping="title"
+  data-strict="1"
+  data-reactions-enabled="1"
+  data-emit-metadata="0"
+  data-input-position="top"
+  data-theme="preferred_color_scheme"
+  data-lang="zh-CN"
+  data-loading="lazy"
+  crossorigin="anonymous"
+  async>
+</script>
+
+
+  
+
+      </section>
+      <aside class="sidebar col-md-3 offset-md-1 col-12">
+        
+  
+  <section class="widget widget-toc">
+    <h3 class="widget-title">文章目录</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%A1%E5%9B%AD%E7%BD%91%E7%9A%84%E9%99%90%E5%88%B6"><span class="toc-text">校园网的限制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%BB%95%E8%BF%87%E7%BD%91%E5%8D%A1%E6%A3%80%E6%B5%8B"><span class="toc-text">使用虚拟机绕过网卡检测</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E6%9C%89%E7%BA%BF%E7%BD%91%E5%8D%A1%E6%A1%A5%E6%8E%A5%E8%B7%AF%E7%94%B1%E5%99%A8"><span class="toc-text">使用有线网卡桥接路由器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BD%93%E5%89%8D%E6%96%B9%E6%A1%88%E7%9A%84%E4%B8%8D%E8%B6%B3%E4%B9%8B%E5%A4%84"><span class="toc-text">当前方案的不足之处</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%A5%E6%89%8B%E5%8F%8C%E7%BD%91%E5%8F%A3%E5%B7%A5%E6%8E%A7%E6%9C%BA%E8%BD%AF%E8%B7%AF%E7%94%B1"><span class="toc-text">入手双网口工控机软路由</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%99%E5%9C%A8%E5%90%8E%E9%9D%A2"><span class="toc-text">写在后面</span></a></li></ol>
+  </section>
+  
+
+        
+
+
+<section class="widget" id="widget-categories">
+  <h3 class="widget-title">分类</h3>
+  
+  
+    <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/tech/">技术</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/diary/">日常</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/essay/">随笔</a></li></ul>
+  
+</section>
+
+
+
+<section class="widget" id="widget-pages">
+  <h3 class="widget-title">页面</h3>
+  <ul class="menu">
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives/" title="">归档</a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about/" title="">关于我</a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-friends">
+        <a href="/friends/" title="">朋友们</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+<section class="widget" id="widget-links">
+  <h3 class="widget-title">链接</h3>
+  <ul class="menu">
+    
+      
+      <li class="menu-item menu-item-github">
+        <a href="https://github.com/prinsss" title="" target="_blank">GitHub</a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-rss">
+        <a href="/atom.xml" title="" target="_blank">RSS Feed</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+      </aside>
+    </div>
+  </div>
+</main>
+
+<footer>
+  
+  <div class="container">
+    <p>
+      &copy; 2026 <a href="https://prinsss.github.io">PRIN BLOG</a>. Proudly published with
+      <a href="https://hexo.io/" target="_blank">Hexo</a> & <a href="https://github.com/printempw/hexo-theme-murasaki/" target="_blank">Murasaki</a>.
+    </p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/han-css@3.3.0/dist/han.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@10.6.0/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@17.3.1/dist/lazyload.min.js"></script>
+<script>
+  hljs.initHighlightingOnLoad();
+  Han(document.querySelector('section.content')).setRoutine([
+    'initCond', 'renderElem', 'renderJiya', 'correctBasicBD', 'substCombLigaWithPUA'
+    // 'renderHanging', 'renderHWS'
+  ]).render();
+  new LazyLoad({
+    elements_selector: '.post-content img',
+    callback_loaded: function (el) {
+      el.parentNode.nodeName.toLowerCase() === 'a' || mediumZoom(el, { margin: 24 });
+    }
+  });
+</script>
+  <script async src="https://oishii.prin.studio/delicious-party"
+    data-website-id="02075562-9733-4917-8c28-be13173bb1f7">
+  </script>
+
+</body>
+</html>

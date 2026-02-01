@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <title>使用 ESLint + Prettier + Commitlint 规范代码风格与提交流程 - PRIN BLOG</title>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="HandheldFriendly" content="True" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+<meta name="generator" content="Hexo" />
+<link rel="icon" href="/images/favicon.png" />
+  <link rel="canonical" href="https://prinsss.github.io/eslint-prettier-commitlint/"/>
+  <link rel="alternate" type="application/atom+xml" href="/atom.xml" title="PRIN BLOG">
+  <meta name="keywords" content="前端," />
+
+<meta name="description" content="最近因为课程需要开了几个多人协作的新项目，感觉有必要在团队中强制一下代码规范，免得提交上来的东西对 leader 血压不好。前后端都是 TypeScript 的，所以就用流行的 ESLint + Prettier 组合拳（配合 Standard 规范），EditorConfig 同步编辑器配置，再加上 commitlint 规范提交信息，最后用 Git Hooks 实现自动化检查。 配置虽然不难，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用 ESLint + Prettier + Commitlint 规范代码风格与提交流程">
+<meta property="og:url" content="https://prinsss.github.io/eslint-prettier-commitlint/index.html">
+<meta property="og:site_name" content="PRIN BLOG">
+<meta property="og:description" content="最近因为课程需要开了几个多人协作的新项目，感觉有必要在团队中强制一下代码规范，免得提交上来的东西对 leader 血压不好。前后端都是 TypeScript 的，所以就用流行的 ESLint + Prettier 组合拳（配合 Standard 规范），EditorConfig 同步编辑器配置，再加上 commitlint 规范提交信息，最后用 Git Hooks 实现自动化检查。 配置虽然不难，">
+<meta property="og:locale">
+<meta property="article:published_time" content="2021-10-13T21:37:49.000Z">
+<meta property="article:modified_time" content="2021-10-13T21:37:49.000Z">
+<meta property="article:author" content="prin">
+<meta property="article:tag" content="前端">
+<meta name="twitter:card" content="summary">
+  <meta name="google-site-verification" content="GRFMvqszPSgldR5B46PfCl67MehNVagYoA9AtJpd8BA" />
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/han-css@3.3.0/dist/han.min.css">
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Fira+Mono|Roboto+Slab:400,600|Noto+Serif+SC:600&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@10.6.0/styles/atom-one-dark.min.css" media="screen and (prefers-color-scheme: dark)">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@10.6.0/styles/atom-one-light.min.css" media="screen and (prefers-color-scheme: light)">
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/node-tikzjax@latest/css/fonts.css" /><style>.tikzjax { display: block; text-align: center; user-select: none; }</style></head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="site-name">
+      <a class="logo" href="/">PRIN BLOG</a>
+      <span class="description">半吊子全栈开发者的日常</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <div class="row">
+      <section class="content col-md-8 col-12">
+        
+  <article>
+    <h1 class="post-title">
+      <a href="/eslint-prettier-commitlint/">使用 ESLint + Prettier + Commitlint 规范代码风格与提交流程</a>
+    </h1>
+    <div class="post-meta">
+      <span class="post-meta-item post-meta-date">
+  <time datetime="2021-10-14T05:37:49+08:00">2021-10-14</time>
+</span>
+
+<span class="post-meta-item post-meta-categories">
+  <span class="post-meta-item-indicator">Category:</span>
+  
+    <a class="category-link" href="/categories/tech/">技术</a>
+  
+</span>
+
+<span class="post-meta-item post-meta-tags">
+  
+    <a class="tag--link" href="/tag/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a>
+  
+</span>
+
+
+<span class="post-meta-item post-meta-views">
+  <span class="pv-counter">loading</span> views
+</span>
+
+
+    </div>
+
+    
+      <script src="https://cdn.jsdelivr.net/npm/dayjs@1.10.4/dayjs.min.js"></script>
+<script>
+  var post_updated = dayjs("2021-10-13T21:37:49.000Z");
+  var days_diff_now = dayjs().diff(post_updated, 'days');
+
+  if (days_diff_now > 365) {
+    document.write(
+      '<div class="post-warning">'+
+        '本文最后修订于 '+days_diff_now+' 天前（'+post_updated.format('YYYY-MM-DD')+'），'+
+        '其中的信息可能已经有所发展或者不再适用于现阶段。'+
+      '</div>'
+    );
+  }
+</script>
+
+    
+
+    
+      <div class="post-toc"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="toc-text">简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#eslint"><span class="toc-text">ESLint</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#prettier"><span class="toc-text">Prettier</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#editorconfig"><span class="toc-text">EditorConfig</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#commitlint"><span class="toc-text">Commitlint</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#git-hooks"><span class="toc-text">Git Hooks</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%80%E5%90%8E"><span class="toc-text">最后</span></a></li></ol></div>
+    
+
+    <div class="post-content"><p>最近因为课程需要开了几个多人协作的新项目，感觉有必要在团队中强制一下代码规范，免得提交上来的东西对 leader 血压不好。前后端都是 TypeScript 的，所以就用流行的 ESLint + Prettier 组合拳（配合 <a target="_blank" rel="noopener" href="https://standardjs.com/">Standard</a> 规范），EditorConfig 同步编辑器配置，再加上 commitlint 规范提交信息，最后用 Git Hooks 实现自动化检查。</p>
+<p>配置虽然不难，但还是有点繁琐的，所以记录一下，如果忘了下次可以翻回来看。</p>
+<span id="more"></span>
+<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2>
+<p>首先来介绍一下这些工具都是啥吧。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://eslint.org/">ESLint</a></li>
+</ul>
+<p>ESLint 是一个插件化并且可配置的 JavaScript 语法规则和代码风格的检查工具，能够帮你轻松写出高质量的 JavaScript 代码。</p>
+<p>简单来说就是可以静态分析代码中的问题（包括语法问题和代码风格问题，比如未使用的变量，<code>if</code> 和括号之间没有空格），给出提示，并且能够自动修复。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://prettier.io/">Prettier</a></li>
+</ul>
+<p>Prettier 是一个“有态度” (opinionated) 的代码格式化工具。它支持大量编程语言，已集成到大多数编辑器中，且几乎不需要设置参数。</p>
+<p>什么叫 opinionated？不同于 ESLint 什么都让你配置，Prettier 是一种严格规范的代码风格工具，主张尽量降低可配置性，严格规定组织代码的方式。</p>
+<p>Prettier 只提供少量配置项，这么做的原因很简单：既然为停止争论而生，那么为何还需要设置更多选项让人们继续纠结于如何配置呢？</p>
+<p>规矩就是这样，不服憋着。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://commitlint.js.org/">commitlint</a></li>
+</ul>
+<p>检查你的 Git 提交信息是否符合配置的格式要求。</p>
+<p>相信大家或多或少都见过某些人奔放不羁的 commit message，不仅给项目管理带来困难，看着也挺难受的。使用 commitlint 可以实现在提交前检查提交信息是否符合规范，配合 commitzen 食用更佳。</p>
+<hr />
+<p>看到这里你可能有些疑问，ESLint 可以自动修复代码风格问题，Prettier 也可以格式化代码，那它们两个不会打架吗？没错，确实会有冲突的情况，而这也是我们后面要解决的。</p>
+<p>既然会冲突，那为什么要同时使用它们呢？主要有这几个原因：</p>
+<ul>
+<li>Prettier 的代码格式化能力更强。它的工作原理是把代码解析成 AST，然后根据规则重新输出，等于帮你整个儿<strong>重写</strong>了一遍代码。ESLint 的 <code>--fix</code> 自动修复虽然也可以实现一定程度的代码格式化，但没有 Prettier 效果好。</li>
+<li>Prettier 支持的文件格式更多，比如 HTML、CSS、JSON、Markdown 等等。</li>
+</ul>
+<p>当然，如果 ESLint 对你来说已经够用，那么不加入 Prettier 其实也是完全没问题的。</p>
+<h2 id="eslint"><a href="#eslint" class="headerlink" title="ESLint"></a>ESLint</h2>
+<p>这里我们采用 Standard 规范。</p>
+<p>以 Vite 新建的 Vue 3 + TS 白板项目为例：</p>
+<pre class="bash"><code>pnpm add -D \
+    @typescript-eslint/eslint-plugin \
+    @typescript-eslint/parser \
+    eslint \
+    eslint-config-standard-with-typescript \
+    eslint-plugin-import \
+    eslint-plugin-node \
+    eslint-plugin-promise \
+    eslint-plugin-vue</code></pre>
+<p>如果你的项目不使用 TypeScript，可以把 <code>eslint-config-standard-with-typescript</code> 规则替换为 <code>eslint-config-standard</code>。</p>
+<pre><code>&quot;lint&quot;: &quot;eslint \&quot;src/**/*.&#123;vue,ts,js&#125;\&quot; --fix&quot;</code></pre>
+<p>.eslintrc.js</p>
+<pre class="javascript"><code>module.exports = &#123;
+  parser: &#39;vue-eslint-parser&#39;,
+  parserOptions: &#123;
+    parser: &#39;@typescript-eslint/parser&#39;,
+    project: &#39;./tsconfig.json&#39;,
+    extraFileExtensions: [&#39;.vue&#39;]
+  &#125;,
+  extends: [
+    &#39;plugin:@typescript-eslint/recommended&#39;,
+    &#39;standard-with-typescript&#39;,
+    &#39;plugin:vue/vue3-recommended&#39;
+  ],
+  root: true,
+  env: &#123;
+    node: true
+  &#125;,
+  rules: &#123;
+    &#39;vue/script-setup-uses-vars&#39;: &#39;error&#39;,
+    &#39;no-console&#39;: process.env.NODE_ENV === &#39;production&#39; ? &#39;warn&#39; : &#39;off&#39;,
+    &#39;no-debugger&#39;: process.env.NODE_ENV === &#39;production&#39; ? &#39;warn&#39; : &#39;off&#39;,
+    &#39;@typescript-eslint/explicit-function-return-type&#39;: &#39;off&#39;,
+    &#39;@typescript-eslint/explicit-module-boundary-types&#39;: &#39;off&#39;,
+    &#39;@typescript-eslint/no-explicit-any&#39;: &#39;off&#39;,
+    &#39;@typescript-eslint/strict-boolean-expressions&#39;: &#39;off&#39;
+  &#125;,
+  globals: &#123;
+    defineProps: &#39;readonly&#39;,
+    defineEmits: &#39;readonly&#39;,
+    defineExpose: &#39;readonly&#39;,
+    withDefaults: &#39;readonly&#39;
+  &#125;
+&#125;</code></pre>
+<p>tsconfig.json</p>
+<pre class="json"><code>&#123;
+  &quot;compilerOptions&quot;: &#123;
+    &quot;target&quot;: &quot;esnext&quot;,
+    &quot;useDefineForClassFields&quot;: true,
+    &quot;module&quot;: &quot;esnext&quot;,
+    &quot;moduleResolution&quot;: &quot;node&quot;,
+    &quot;strict&quot;: true,
+    &quot;jsx&quot;: &quot;preserve&quot;,
+    &quot;sourceMap&quot;: true,
+    &quot;resolveJsonModule&quot;: true,
+    &quot;esModuleInterop&quot;: true,
+    &quot;lib&quot;: [&quot;esnext&quot;, &quot;dom&quot;]
+  &#125;,
+  &quot;include&quot;: [
+    &quot;src/**/*&quot;,
+    &quot;.eslintrc.js&quot;,
+    &quot;vite.config.ts&quot;
+  ]
+&#125;</code></pre>
+<h2 id="prettier"><a href="#prettier" class="headerlink" title="Prettier"></a>Prettier</h2>
+<p>需要注意的是，Prettier 和 Standard 规范并不完全兼容。</p>
+<pre><code>pnpm add -D \
+    prettier \
+    eslint-config-prettier \
+    eslint-plugin-prettier</code></pre>
+<p>.eslintrc.js</p>
+<pre class="diff"><code> extends: [
+   &#39;plugin:@typescript-eslint/recommended&#39;,
+   &#39;standard-with-typescript&#39;,
+   &#39;plugin:vue/vue3-recommended&#39;,
++  &#39;plugin:prettier/recommended&#39;
+ ],</code></pre>
+<p>.prettierrc</p>
+<pre><code>&#123;
+  &quot;trailingComma&quot;: &quot;none&quot;,
+  &quot;semi&quot;: false,
+  &quot;singleQuote&quot;: true
+&#125;</code></pre>
+<pre><code>&quot;lint&quot;: &quot;eslint \&quot;src/**/*.&#123;vue,ts,js&#125;\&quot; --fix&quot;,
+&quot;format&quot;: &quot;prettier --write \&quot;src/**/*.&#123;vue,ts,js&#125;\&quot;&quot;</code></pre>
+<h2 id="editorconfig"><a href="#editorconfig" class="headerlink" title="EditorConfig"></a>EditorConfig</h2>
+<p>自古以来，Tab or Space 就是不曾停歇的圣战。</p>
+<p>不同成员都有不同的喜好，使用的编辑器/IDE 也不尽相同。那么为了 codebase 的规范，在所有项目成员中使用一个统一的配置是很有必要的。</p>
+<pre><code>root = true
+
+[*]
+charset = utf-8
+indent_style = space
+indent_size = 2
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.&#123;js,jsx,ts,tsx,vue&#125;]
+indent_style = space
+indent_size = 2
+trim_trailing_whitespace = true
+insert_final_newline = true
+</code></pre>
+<h2 id="commitlint"><a href="#commitlint" class="headerlink" title="Commitlint"></a>Commitlint</h2>
+<p>比如很多项目都采用的 Conventional Commits 就要求提交信息必须符合以下规范：</p>
+<pre><code>&lt;type&gt;[optional scope]: &lt;description&gt;
+
+[optional body]
+
+[optional footer(s)]</code></pre>
+<p>为什么要使用 Conventional Commits？</p>
+<ul>
+<li>自动生成 CHANGELOG</li>
+<li>基于提交类型生成语义化版本号</li>
+<li>项目提交历史更清晰</li>
+</ul>
+<h2 id="git-hooks"><a href="#git-hooks" class="headerlink" title="Git Hooks"></a>Git Hooks</h2>
+<p>【鸽了】</p>
+<p>反正就是让上面那些工具可以在 Git 提交时自动执行，检查不通过的就打回。</p>
+<h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2>
+<p>还记得很久以前别人给我发了个 Pull Request，我一看，发现有好多地方的代码风格都和我不一样，比如单双引号、分号的使用，还有我最不能忍的 <code>if(xxx)&#123;&#125;</code> 之间不加空格……</p>
+<p>但我想想再叫人家改也怪麻烦的，就默默接受了 PR，然后再默默改成自己的代码风格……</p>
+<p>现在有了这些东西工作流程就规范多了：</p>
+<ul>
+<li>你乱写也行，我直接给你格式化掉；</li>
+<li>语法检查，在编写过程中就排除潜在的 BUG；</li>
+<li>提交上来的代码必须通过以上验证，不然就拒绝；</li>
+<li>提交信息也要规范，不能瞎写乱写。</li>
+</ul>
+<p>当然了，规矩是死的人是活的，这一套下来也没法保证一定万无一失。不过相比以前群魔乱舞的场面，已经省心了不少。</p>
+<p>不过说实在话，比起配置这些工具，推行一个大家都能接受的规范才更难吧（x）</p>
+</div>
+    <div class="post-copyright"><p>除另有声明外，本博客文章均采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by/4.0/">知识共享(Creative Commons) 署名 4.0 国际许可协议</a> 进行许可。转载请注明原作者与文章出处。</p></div>
+  </article>
+
+  
+    <nav class="post-nav">
+      
+      <div class="post-nav-item post-nav-prev">上一篇：
+        <a href="/ghcr-io-with-github-actions/">GitHub 全家桶：Actions 自动构建多架构 Docker 镜像并上传至 Packages (ghcr.io)</a>
+      </div>
+      
+      
+      <div class="post-nav-item post-nav-next">下一篇：
+        <a href="/laravel-sail-built-with-mirrors/">使用国内镜像加速 Laravel Sail 构建</a>
+      </div>
+      
+    </nav>
+  
+
+  
+    
+
+
+<script src="https://giscus.app/client.js"
+  data-repo="prinsss/prinsss.github.io"
+  data-repo-id="MDEwOlJlcG9zaXRvcnkxMDU3MzY5MTA="
+  data-category="Announcements"
+  data-category-id="DIC_kwDOBk1qzs4CawFb"
+  data-mapping="title"
+  data-strict="1"
+  data-reactions-enabled="1"
+  data-emit-metadata="0"
+  data-input-position="top"
+  data-theme="preferred_color_scheme"
+  data-lang="zh-CN"
+  data-loading="lazy"
+  crossorigin="anonymous"
+  async>
+</script>
+
+
+  
+
+      </section>
+      <aside class="sidebar col-md-3 offset-md-1 col-12">
+        
+  
+  <section class="widget widget-toc">
+    <h3 class="widget-title">文章目录</h3>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="toc-text">简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#eslint"><span class="toc-text">ESLint</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#prettier"><span class="toc-text">Prettier</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#editorconfig"><span class="toc-text">EditorConfig</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#commitlint"><span class="toc-text">Commitlint</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#git-hooks"><span class="toc-text">Git Hooks</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%80%E5%90%8E"><span class="toc-text">最后</span></a></li></ol>
+  </section>
+  
+
+        
+
+
+<section class="widget" id="widget-categories">
+  <h3 class="widget-title">分类</h3>
+  
+  
+    <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/tech/">技术</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/diary/">日常</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/essay/">随笔</a></li></ul>
+  
+</section>
+
+
+
+<section class="widget" id="widget-pages">
+  <h3 class="widget-title">页面</h3>
+  <ul class="menu">
+    
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives/" title="">归档</a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about/" title="">关于我</a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-friends">
+        <a href="/friends/" title="">朋友们</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+<section class="widget" id="widget-links">
+  <h3 class="widget-title">链接</h3>
+  <ul class="menu">
+    
+      
+      <li class="menu-item menu-item-github">
+        <a href="https://github.com/prinsss" title="" target="_blank">GitHub</a>
+      </li>
+    
+      
+      <li class="menu-item menu-item-rss">
+        <a href="/atom.xml" title="" target="_blank">RSS Feed</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+      </aside>
+    </div>
+  </div>
+</main>
+
+<footer>
+  
+  <div class="container">
+    <p>
+      &copy; 2026 <a href="https://prinsss.github.io">PRIN BLOG</a>. Proudly published with
+      <a href="https://hexo.io/" target="_blank">Hexo</a> & <a href="https://github.com/printempw/hexo-theme-murasaki/" target="_blank">Murasaki</a>.
+    </p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/han-css@3.3.0/dist/han.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@10.6.0/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@17.3.1/dist/lazyload.min.js"></script>
+<script>
+  hljs.initHighlightingOnLoad();
+  Han(document.querySelector('section.content')).setRoutine([
+    'initCond', 'renderElem', 'renderJiya', 'correctBasicBD', 'substCombLigaWithPUA'
+    // 'renderHanging', 'renderHWS'
+  ]).render();
+  new LazyLoad({
+    elements_selector: '.post-content img',
+    callback_loaded: function (el) {
+      el.parentNode.nodeName.toLowerCase() === 'a' || mediumZoom(el, { margin: 24 });
+    }
+  });
+</script>
+  <script async src="https://oishii.prin.studio/delicious-party"
+    data-website-id="02075562-9733-4917-8c28-be13173bb1f7">
+  </script>
+
+</body>
+</html>
